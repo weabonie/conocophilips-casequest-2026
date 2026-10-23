@@ -1,0 +1,445 @@
+{
+  "source": "CaseQuest2026Dataset.xlsx",
+  "period": "2025 full year",
+  "hseAsOf": "2026-10-01",
+  "sites": [
+    {
+      "id": "S01",
+      "name": "Cedar",
+      "spareFill": 86,
+      "technicians": 4,
+      "network": 99.2,
+      "criticalActions": 0,
+      "openActions": 1,
+      "events": 48,
+      "hours": 815.89,
+      "netBbl": 14071.87,
+      "loss": 615781.78,
+      "stages": {
+        "detect": 139.12,
+        "dispatch": 136.0,
+        "parts_wait": 110.45,
+        "repair": 361.55,
+        "restart": 68.77
+      },
+      "causes": [
+        {
+          "name": "Bearing wear",
+          "hours": 241.42,
+          "events": 11
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 209.22,
+          "events": 12
+        },
+        {
+          "name": "Process upset",
+          "hours": 113.23,
+          "events": 8
+        },
+        {
+          "name": "Seal leak",
+          "hours": 192.36,
+          "events": 13
+        },
+        {
+          "name": "Unknown",
+          "hours": 59.66,
+          "events": 4
+        }
+      ],
+      "assets": [
+        {
+          "id": "A001",
+          "type": "Transfer pump",
+          "events": 17,
+          "hours": 275.76,
+          "partsHours": 33.89,
+          "loss": 208881.79
+        },
+        {
+          "id": "A002",
+          "type": "Lift pump",
+          "events": 17,
+          "hours": 294.21,
+          "partsHours": 40.0,
+          "loss": 165527.9
+        },
+        {
+          "id": "A003",
+          "type": "Compressor",
+          "events": 14,
+          "hours": 245.92,
+          "partsHours": 36.56,
+          "loss": 241372.09
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "name": "Mesa",
+      "spareFill": 65,
+      "technicians": 3,
+      "network": 96.4,
+      "criticalActions": 2,
+      "openActions": 3,
+      "events": 56,
+      "hours": 1246.4,
+      "netBbl": 24011.74,
+      "loss": 1032194.76,
+      "stages": {
+        "detect": 142.62,
+        "dispatch": 242.81,
+        "parts_wait": 326.61,
+        "repair": 452.5,
+        "restart": 81.86
+      },
+      "causes": [
+        {
+          "name": "Bearing wear",
+          "hours": 585.9,
+          "events": 23
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 126.29,
+          "events": 6
+        },
+        {
+          "name": "Process upset",
+          "hours": 126.82,
+          "events": 7
+        },
+        {
+          "name": "Seal leak",
+          "hours": 308.79,
+          "events": 14
+        },
+        {
+          "name": "Unknown",
+          "hours": 98.6,
+          "events": 6
+        }
+      ],
+      "assets": [
+        {
+          "id": "A004",
+          "type": "Transfer pump",
+          "events": 17,
+          "hours": 390.52,
+          "partsHours": 101.06,
+          "loss": 406480.41
+        },
+        {
+          "id": "A005",
+          "type": "Lift pump",
+          "events": 20,
+          "hours": 452.27,
+          "partsHours": 130.56,
+          "loss": 346912.99
+        },
+        {
+          "id": "A006",
+          "type": "Compressor",
+          "events": 19,
+          "hours": 403.61,
+          "partsHours": 94.99,
+          "loss": 278801.36
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "name": "Juniper",
+      "spareFill": 92,
+      "technicians": 4,
+      "network": 99.5,
+      "criticalActions": 0,
+      "openActions": 0,
+      "events": 40,
+      "hours": 625.27,
+      "netBbl": 11861.06,
+      "loss": 506754.18,
+      "stages": {
+        "detect": 106.99,
+        "dispatch": 82.02,
+        "parts_wait": 88.43,
+        "repair": 291.06,
+        "restart": 56.77
+      },
+      "causes": [
+        {
+          "name": "Bearing wear",
+          "hours": 270.19,
+          "events": 18
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 97.5,
+          "events": 7
+        },
+        {
+          "name": "Process upset",
+          "hours": 122.44,
+          "events": 6
+        },
+        {
+          "name": "Seal leak",
+          "hours": 85.9,
+          "events": 5
+        },
+        {
+          "name": "Unknown",
+          "hours": 49.24,
+          "events": 4
+        }
+      ],
+      "assets": [
+        {
+          "id": "A007",
+          "type": "Transfer pump",
+          "events": 12,
+          "hours": 192.73,
+          "partsHours": 14.81,
+          "loss": 157412.0
+        },
+        {
+          "id": "A008",
+          "type": "Lift pump",
+          "events": 15,
+          "hours": 279.08,
+          "partsHours": 73.62,
+          "loss": 181194.22
+        },
+        {
+          "id": "A009",
+          "type": "Compressor",
+          "events": 13,
+          "hours": 153.46,
+          "partsHours": 0.0,
+          "loss": 168147.96
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "name": "Arroyo",
+      "spareFill": 42,
+      "technicians": 2,
+      "network": 92.8,
+      "criticalActions": 2,
+      "openActions": 3,
+      "events": 68,
+      "hours": 1986.12,
+      "netBbl": 48655.78,
+      "loss": 2017459.23,
+      "stages": {
+        "detect": 328.5,
+        "dispatch": 393.11,
+        "parts_wait": 644.81,
+        "repair": 507.65,
+        "restart": 112.05
+      },
+      "causes": [
+        {
+          "name": "Bearing wear",
+          "hours": 923.82,
+          "events": 29
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 241.36,
+          "events": 9
+        },
+        {
+          "name": "Process upset",
+          "hours": 277.43,
+          "events": 11
+        },
+        {
+          "name": "Seal leak",
+          "hours": 230.39,
+          "events": 9
+        },
+        {
+          "name": "Unknown",
+          "hours": 313.12,
+          "events": 10
+        }
+      ],
+      "assets": [
+        {
+          "id": "A010",
+          "type": "Transfer pump",
+          "events": 23,
+          "hours": 599.3,
+          "partsHours": 168.03,
+          "loss": 726730.71
+        },
+        {
+          "id": "A011",
+          "type": "Lift pump",
+          "events": 22,
+          "hours": 696.27,
+          "partsHours": 265.56,
+          "loss": 606508.74
+        },
+        {
+          "id": "A012",
+          "type": "Compressor",
+          "events": 23,
+          "hours": 690.55,
+          "partsHours": 211.22,
+          "loss": 684219.79
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "name": "Canyon",
+      "spareFill": 78,
+      "technicians": 3,
+      "network": 98.1,
+      "criticalActions": 0,
+      "openActions": 1,
+      "events": 46,
+      "hours": 844.54,
+      "netBbl": 14597.03,
+      "loss": 594480.15,
+      "stages": {
+        "detect": 138.91,
+        "dispatch": 136.06,
+        "parts_wait": 194.91,
+        "repair": 309.41,
+        "restart": 65.25
+      },
+      "causes": [
+        {
+          "name": "Bearing wear",
+          "hours": 285.8,
+          "events": 14
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 141.58,
+          "events": 9
+        },
+        {
+          "name": "Process upset",
+          "hours": 189.66,
+          "events": 12
+        },
+        {
+          "name": "Seal leak",
+          "hours": 117.75,
+          "events": 6
+        },
+        {
+          "name": "Unknown",
+          "hours": 109.75,
+          "events": 5
+        }
+      ],
+      "assets": [
+        {
+          "id": "A013",
+          "type": "Transfer pump",
+          "events": 16,
+          "hours": 312.88,
+          "partsHours": 96.05,
+          "loss": 210216.13
+        },
+        {
+          "id": "A014",
+          "type": "Lift pump",
+          "events": 15,
+          "hours": 257.55,
+          "partsHours": 37.73,
+          "loss": 152660.65
+        },
+        {
+          "id": "A015",
+          "type": "Compressor",
+          "events": 15,
+          "hours": 274.11,
+          "partsHours": 61.13,
+          "loss": 231603.36
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "name": "Prairie",
+      "spareFill": 70,
+      "technicians": 3,
+      "network": 97.4,
+      "criticalActions": 2,
+      "openActions": 3,
+      "events": 55,
+      "hours": 1080.33,
+      "netBbl": 21024.06,
+      "loss": 841719.51,
+      "stages": {
+        "detect": 134.41,
+        "dispatch": 212.08,
+        "parts_wait": 248.11,
+        "repair": 409.17,
+        "restart": 76.56
+      },
+      "causes": [
+        {
+          "name": "Bearing wear",
+          "hours": 398.06,
+          "events": 20
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 195.85,
+          "events": 10
+        },
+        {
+          "name": "Process upset",
+          "hours": 180.63,
+          "events": 8
+        },
+        {
+          "name": "Seal leak",
+          "hours": 160.96,
+          "events": 10
+        },
+        {
+          "name": "Unknown",
+          "hours": 144.83,
+          "events": 7
+        }
+      ],
+      "assets": [
+        {
+          "id": "A016",
+          "type": "Transfer pump",
+          "events": 18,
+          "hours": 352.93,
+          "partsHours": 89.34,
+          "loss": 307591.13
+        },
+        {
+          "id": "A017",
+          "type": "Lift pump",
+          "events": 17,
+          "hours": 279.75,
+          "partsHours": 10.87,
+          "loss": 181822.04
+        },
+        {
+          "id": "A018",
+          "type": "Compressor",
+          "events": 20,
+          "hours": 447.65,
+          "partsHours": 147.9,
+          "loss": 352306.34
+        }
+      ]
+    }
+  ]
+}
