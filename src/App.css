@@ -1,237 +1,116 @@
-/* Layout Shell - Light Theme Minimal */
+@reference "tailwindcss";
+
+/* Tailwind CSS Applied to Component Classnames */
+
 .cf-dashboard {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f9fafb;
-  color: #111827;
-  font-size: 13px;
-  position: relative;
-  overflow-x: hidden;
+  @apply flex min-h-screen bg-gray-50 text-gray-900 text-[13px] relative overflow-x-hidden antialiased;
 }
 
-/* =========================================================
-   Left Sidebar (Only Home)
-========================================================= */
+/* Sidebar */
 .cf-sidebar {
-  width: 220px;
-  min-width: 220px;
-  background-color: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  user-select: none;
-  z-index: 20;
+  @apply w-[220px] min-w-[220px] bg-white border-r border-gray-200 flex flex-col shrink-0 h-screen sticky top-0 select-none z-20;
 }
 
 .sidebar-brand {
-  padding: 18px 16px;
-  border-bottom: 1px solid #f3f4f6;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  @apply p-4 border-b border-gray-100 flex items-center gap-2.5;
 }
 
 .brand-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background-color: #2563eb;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 13px;
+  @apply w-6.5 h-6.5 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-xs;
 }
 
 .brand-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  letter-spacing: -0.01em;
+  @apply text-sm font-semibold text-gray-900 tracking-tight;
 }
 
 .sidebar-nav {
-  padding: 16px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  @apply p-3 flex flex-col gap-1;
 }
 
-/* Only ONE section in sidebar: Home */
 .nav-item-single {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #1d4ed8;
-  background-color: #eff6ff;
-  border: 1px solid #dbeafe;
-  transition: all 0.15s ease;
-  width: 100%;
-  text-align: left;
+  @apply flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors duration-150 w-full text-left;
 }
 
-.nav-item-single:hover {
-  background-color: #e0e7ff;
-}
-
-/* =========================================================
-   Main Area: Placeholder Section
-========================================================= */
+/* Main Area */
 .cf-placeholder-main {
-  flex: 1;
-  min-width: 0;
-  padding: 36px 40px;
-  display: flex;
-  flex-direction: column;
-  background-color: #f9fafb;
+  @apply flex-1 min-w-0 p-8 sm:p-10 flex flex-col bg-gray-50;
 }
 
 .placeholder-container {
-  max-width: 760px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  @apply max-w-3xl w-full flex flex-col gap-5;
 }
 
 .placeholder-header {
-  margin-bottom: 6px;
+  @apply mb-1.5;
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #111827;
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
+  @apply text-2xl font-semibold text-gray-900 tracking-tight mb-1.5;
 }
 
 .page-subtitle {
-  font-size: 13.5px;
-  color: #6b7280;
-  line-height: 1.45;
+  @apply text-[13.5px] text-gray-500 leading-relaxed;
 }
 
 .placeholder-card {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  @apply bg-white border border-gray-200 rounded-lg p-5 flex flex-col gap-2.5 shadow-xs;
 }
 
 .placeholder-card-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
+  @apply text-sm font-semibold text-gray-900;
 }
 
 .placeholder-card-text {
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.5;
+  @apply text-[13px] text-gray-500 leading-normal;
 }
 
-/* Minimal set of buttons / list */
+/* List Buttons */
 .placeholder-list-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
+  @apply flex flex-col gap-2 mt-1;
 }
 
 .placeholder-list-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  transition: all 0.15s ease;
-  width: 100%;
-  text-align: left;
-}
-
-.placeholder-list-item:hover {
-  background-color: #f9fafb;
-  border-color: #cbd5e1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  @apply flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 hover:border-slate-300 hover:shadow-xs transition-all duration-150 w-full text-left cursor-pointer;
 }
 
 .item-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: #111827;
+  @apply text-[13px] font-medium text-gray-900;
 }
 
 .placeholder-list-item:hover .item-title {
-  color: #2563eb;
+  @apply text-blue-600;
 }
 
 .item-subtext {
-  font-size: 12px;
-  color: #9ca3af;
+  @apply text-xs text-gray-400;
 }
 
-/* Placeholder Stats */
+/* Stats */
 .placeholder-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  @apply grid grid-cols-1 sm:grid-cols-3 gap-3;
 }
 
 .placeholder-stat-box {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  @apply bg-white border border-gray-200 rounded-lg p-4 flex flex-col gap-1 shadow-xs;
 }
 
 .stat-label {
-  font-size: 12px;
-  color: #6b7280;
+  @apply text-xs text-gray-500;
 }
 
 .stat-val {
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
+  @apply text-lg font-semibold text-gray-900;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .cf-dashboard {
-    flex-direction: column;
+    @apply flex-col;
   }
   .cf-sidebar {
-    width: 100%;
-    min-width: 100%;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid #e5e7eb;
+    @apply w-full min-w-full h-auto relative border-r-0 border-b border-gray-200;
   }
   .cf-placeholder-main {
-    padding: 24px 16px;
-  }
-  .placeholder-grid {
-    grid-template-columns: 1fr;
+    @apply p-4;
   }
 }
