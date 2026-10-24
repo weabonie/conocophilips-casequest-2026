@@ -11,6 +11,11 @@ import {
   RefreshCw,
   X,
   FileText,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  User,
+  Package,
 } from 'lucide-react'
 import { JOB_STATUSES } from '../utils/maintenanceStorage'
 
@@ -25,11 +30,12 @@ export default function MaintenanceQueueTable({
   const [filterScope, setFilterScope] = useState('all') // 'all' | 'needs_prep' | 'scheduled' | 'draft'
   const [searchQuery, setSearchQuery] = useState('')
   const [statusNotice, setStatusNotice] = useState(null)
+  const [expandedHistoryId, setExpandedHistoryId] = useState(null)
 
   // Filter requests
   const filteredRequests = useMemo(() => {
     return requests.filter((req) => {
-      // Site filter (if a specific site is selected in the parent page)
+      // Site filter
       if (selectedSite && req.siteId !== selectedSite) {
         return false
       }
@@ -53,7 +59,8 @@ export default function MaintenanceQueueTable({
         const matchSite = req.siteName?.toLowerCase().includes(q)
         const matchTask = req.task?.toLowerCase().includes(q)
         const matchTeam = req.assignedTeam?.toLowerCase().includes(q)
-        if (!matchId && !matchAsset && !matchSite && !matchTask && !matchTeam) {
+        const matchPart = req.reservedPartName?.toLowerCase().includes(q)
+        if (!matchId && !matchAsset && !matchSite && !matchTask && !matchTeam && !matchPart) {
           return false
         }
       }
@@ -71,11 +78,15 @@ export default function MaintenanceQueueTable({
     return { total, needsPrep, scheduled, drafts }
   }, [requests])
 
+  const toggleHistory = (id) => {
+    setExpandedHistoryId((prev) => (prev === id ? null : id))
+  }
+
   const handleQuickStatusChange = (req, newStatus) => {
     if (newStatus === 'Scheduled' && req.readiness === 'Needs preparation') {
       setStatusNotice({
         type: 'blocked',
-        message: `Cannot mark ${req.id} as Scheduled: Team is unassigned or parts readiness is unconfirmed.`,
+        message: `Cannot mark ${req.id} as Scheduled: Team is unassigned or parts are not reserved in warehouse.`,
       })
       setTimeout(() => setStatusNotice(null), 4500)
       return
@@ -84,14 +95,28 @@ export default function MaintenanceQueueTable({
     onStatusChange(req.id, newStatus)
     setStatusNotice({
       type: 'success',
-      message: `${req.id} status updated to '${newStatus}'.`,
+      message: `${req.id} status updated to '${newStatus}'${
+        newStatus === 'Completed' && req.hasConfirmedReservation && !req.partsConsumed
+          ? ' (Reserved parts consumed from warehouse)'
+          : ''
+      }.`,
     })
-    setTimeout(() => setStatusNotice(null), 3000)
+    setTimeout(() => setStatusNotice(null), 3500)
   }
 
   const formatDateDisplay = (dateStr, timeStr) => {
     if (!dateStr) return 'Date unset'
     return `${dateStr} · ${timeStr || '08:00'}`
+  }
+
+  const formatTimestamp = (isoStr) => {
+    if (!isoStr) return '—'
+    try {
+      const d = new Date(isoStr)
+      return `${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}`
+    } catch {
+      return isoStr
+    }
   }
 
   return (
@@ -115,10 +140,10 @@ export default function MaintenanceQueueTable({
       {/* Panel Header */}
       <div className="panel-heading">
         <div>
-          <div className="eyebrow">WORK ORDERS</div>
-          <h2>Maintenance queue</h2>
+          <div className="eyebrow">OPERATIONAL WORKFLOW</div>
+          <h2>Saved Maintenance Queue</h2>
           <p>
-            Review readiness, assignments, and upcoming maintenance.
+            Persisted locally · Linked to warehouse parts reservations and team assignments
           </p>
         </div>
         <div className="queue-header-actions">
@@ -193,7 +218,7 @@ export default function MaintenanceQueueTable({
               <th>Task</th>
               <th>Proposed Date / Time</th>
               <th>Assigned Team</th>
-              <th>Readiness</th>
+              <th>Warehouse Parts Readiness</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -204,9 +229,10 @@ export default function MaintenanceQueueTable({
               const isScheduled = req.status === 'Scheduled'
               const isInProgress = req.status === 'In progress'
               const isCompleted = req.status === 'Completed'
+              const isExpanded = expandedHistoryId === req.id
 
               return (
-                <tr key={req.id}>
+                <tr key={req.id} className={isExpanded ? 'row-expanded' : ''}>
                   {/* Request ID */}
                   <td>
                     <span className="req-id-badge">{req.id}</span>
@@ -251,14 +277,14 @@ export default function MaintenanceQueueTable({
 
                   {/* Assigned Team */}
                   <td>
-                    {req.assignedTeam ? (
+                    {req.assignedTeam && req.assignedTeam !== 'unassigned' ? (
                       <span className="team-assigned">{req.assignedTeam}</span>
                     ) : (
-                      <span className="team-unassigned">Unassigned</span>
+                      <span className="team-unassigned">Unassigned (Demo)</span>
                     )}
                   </td>
 
-                  {/* Readiness */}
+                  {/* Warehouse Parts Readiness */}
                   <td>
                     <div className="readiness-cell">
                       {isNeedsPrep ? (
@@ -272,9 +298,20 @@ export default function MaintenanceQueueTable({
                           Ready for review
                         </span>
                       )}
-                      <small className="parts-readiness-sub">
-                        Parts: {req.partsReadiness || 'Not checked'}
-                      </small>
+
+                      {/* Linked Warehouse Reservation details */}
+                      {req.hasConfirmedReservation ? (
+                        <span className="parts-res-tag confirmed" title={`Reserved: ${req.reservedPartName || 'Part'}`}>
+                          <Package size={10} />
+                          {req.reservedPartName ? req.reservedPartName.split('(')[0] : 'Part reserved'} ({req.reservedQty || 1})
+                          {req.partsConsumed && <small className="ml-1 text-emerald-800">[Consumed]</small>}
+                        </span>
+                      ) : (
+                        <span className="parts-res-tag unreserved">
+                          <AlertTriangle size={10} />
+                          No parts reserved
+                        </span>
+                      )}
                     </div>
                   </td>
 
@@ -302,7 +339,7 @@ export default function MaintenanceQueueTable({
                     </div>
                   </td>
 
-                  {/* Actions */}
+                  {/* Actions & History Toggle */}
                   <td>
                     <div className="table-actions-cell">
                       {/* Inline Status Selector */}
@@ -341,11 +378,50 @@ export default function MaintenanceQueueTable({
                         type="button"
                         className="btn-action delete"
                         onClick={() => onDeleteRequest(req.id)}
-                        title="Delete maintenance request"
+                        title="Delete maintenance request and release reservation"
                       >
                         <Trash2 size={12} />
                       </button>
+
+                      {/* Expandable Activity History Toggle */}
+                      <button
+                        type="button"
+                        className="btn-history-toggle"
+                        onClick={() => toggleHistory(req.id)}
+                        title="Toggle activity history"
+                      >
+                        <span>History ({(req.history || []).length})</span>
+                        {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                      </button>
                     </div>
+
+                    {/* Expandable Activity History Timeline */}
+                    {isExpanded && (
+                      <div className="request-history-timeline">
+                        <div className="history-timeline-title">
+                          <Clock size={11} />
+                          <span>Activity History · Work Order {req.id}</span>
+                        </div>
+                        <div className="history-entries-list">
+                          {(req.history || []).map((h) => (
+                            <div key={h.id} className="history-entry-item">
+                              <span className="history-dot" />
+                              <div className="history-content">
+                                <div className="history-meta-row">
+                                  <strong className="history-action">{h.action}</strong>
+                                  <span className="history-time">{formatTimestamp(h.timestamp)}</span>
+                                </div>
+                                <div className="history-user-row">
+                                  <User size={10} />
+                                  <span>{h.by || 'Operations Planner'}</span>
+                                </div>
+                                {h.note && <p className="history-note">{h.note}</p>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </td>
                 </tr>
               )
@@ -363,7 +439,7 @@ export default function MaintenanceQueueTable({
           <h3>No Maintenance Requests in Queue</h3>
           <p>
             {requests.length === 0
-              ? "Select 'Schedule maintenance' on an equipment card to create a request."
+              ? "Select 'Schedule maintenance' on any equipment card above to create a prototype work order."
               : 'No maintenance requests match your current search or status filter.'}
           </p>
           <div className="empty-state-actions">
@@ -374,7 +450,7 @@ export default function MaintenanceQueueTable({
                 onClick={onResetDemoRequests}
               >
                 <RefreshCw size={12} />
-                <span>Load sample requests</span>
+                <span>Load Sample Prototype Requests</span>
               </button>
             ) : (
               <button
@@ -395,7 +471,8 @@ export default function MaintenanceQueueTable({
       {/* Queue Disclaimer & Realism Separator */}
       <div className="queue-footer-note">
         <span>
-          Planning records · Sample teams · Field work requires supervisor authorization.
+          <strong>Prototype Planning Storage:</strong> Work orders persist locally in browser storage (key: <code>cq_prototype_maintenance_requests_v1</code>).
+          Entries do not modify 2025 historical Excel records. Field execution requires qualified supervisor work permits and HSE verification.
         </span>
       </div>
     </section>

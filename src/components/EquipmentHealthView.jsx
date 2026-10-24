@@ -11,22 +11,40 @@ import {
   Gauge,
   Thermometer,
   ShieldAlert,
+  Package,
 } from 'lucide-react'
 import MaintenanceScheduleModal from './MaintenanceScheduleModal'
 import MaintenanceQueueTable from './MaintenanceQueueTable'
+import PartsAvailabilityModal from './PartsAvailabilityModal'
+import PartsRequestsTable from './PartsRequestsTable'
 import {
   loadRequests,
   saveRequests,
   getNextRequestId,
+  handleRequestStatusTransition,
+  cancelOrDeleteMaintenanceRequest,
   INITIAL_SEED_REQUESTS,
-} from '../utils/maintenanceStorage'
+} from '../utils/maintenanceStorage.js'
+import {
+  loadInventory,
+  loadPartsRequests,
+  approvePartsRequest,
+  rejectPartsRequest,
+  updatePartsRequestQty,
+  recordPartsReceipt,
+} from '../utils/inventoryStorage.js'
 
 const number = (value, digits = 0) =>
   typeof value === 'number' && !isNaN(value)
     ? value.toLocaleString('en-US', { maximumFractionDigits: digits })
     : 'Unavailable'
 
-export default function EquipmentHealthView({ data, selectedSite, onSelectSite }) {
+export default function EquipmentHealthView({
+  data,
+  selectedSite,
+  onSelectSite,
+  currentUser,
+}) {
   const [filterStatus, setFilterStatus] = useState('all') // 'all' | 'warning' | 'optimal' | 'stopped'
   const [searchQuery, setSearchQuery] = useState('')
   const [notification, setNotification] = useState(null)
@@ -34,12 +52,25 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
   // Prototype Maintenance Queue state loaded from localStorage
   const [requests, setRequests] = useState(() => loadRequests())
 
-  // Single active modal state (create or edit)
-  const [modalState, setModalState] = useState({
+  // Sample Warehouse Inventory state loaded from localStorage
+  const [inventory, setInventory] = useState(() => loadInventory())
+
+  // Parts Requests Queue state loaded from localStorage
+  const [partsRequests, setPartsRequests] = useState(() => loadPartsRequests())
+
+  // Maintenance Scheduling Modal State
+  const [scheduleModalState, setScheduleModalState] = useState({
     isOpen: false,
     asset: null,
     site: null,
     initialData: null,
+  })
+
+  // Parts Availability Modal State
+  const [partsModalState, setPartsModalState] = useState({
+    isOpen: false,
+    asset: null,
+    site: null,
   })
 
   // Extract equipment list from data
@@ -111,10 +142,15 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
     setTimeout(() => setNotification(null), 5000)
   }
 
-  // Open scheduling modal for an equipment card
+  // Refresh inventory state
+  const handleInventoryUpdated = () => {
+    setInventory(loadInventory())
+  }
+
+  // Handle open scheduling modal
   const handleOpenScheduleModal = (asset) => {
     const siteObj = data?.sites?.find((s) => s.id === asset.siteId) || null
-    setModalState({
+    setScheduleModalState({
       isOpen: true,
       asset,
       site: siteObj,
@@ -122,7 +158,17 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
     })
   }
 
-  // Edit an existing maintenance request from the queue
+  // Handle open parts availability modal
+  const handleOpenPartsModal = (asset) => {
+    const siteObj = data?.sites?.find((s) => s.id === asset.siteId) || null
+    setPartsModalState({
+      isOpen: true,
+      asset,
+      site: siteObj,
+    })
+  }
+
+  // Edit existing maintenance request from queue
   const handleEditRequest = (req) => {
     const assetObj = allEquipment.find((a) => a.id === req.assetId) || {
       id: req.assetId,
@@ -134,7 +180,7 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
       events: 0,
     }
     const siteObj = data?.sites?.find((s) => s.id === req.siteId) || null
-    setModalState({
+    setScheduleModalState({
       isOpen: true,
       asset: assetObj,
       site: siteObj,
@@ -142,19 +188,21 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
     })
   }
 
-  const handleCloseModal = () => {
-    setModalState({ isOpen: false, asset: null, site: null, initialData: null })
+  const handleCloseScheduleModal = () => {
+    setScheduleModalState({ isOpen: false, asset: null, site: null, initialData: null })
   }
 
-  // Save new or updated maintenance request to localStorage
+  const handleClosePartsModal = () => {
+    setPartsModalState({ isOpen: false, asset: null, site: null })
+  }
+
+  // Save new or updated maintenance request
   const handleSaveRequest = (formData) => {
     let updatedRequests
     if (formData.id) {
-      // Update existing
       updatedRequests = requests.map((r) => (r.id === formData.id ? formData : r))
       showNotification('success', `Maintenance request ${formData.id} updated successfully.`)
     } else {
-      // Create new
       const newId = getNextRequestId(requests)
       const newRequest = {
         ...formData,
@@ -176,43 +224,104 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
 
     setRequests(updatedRequests)
     saveRequests(updatedRequests)
+    handleInventoryUpdated()
   }
 
-  // Simple status update action from the queue table
-  const handleStatusChange = (requestId, newStatus) => {
-    const updated = requests.map((r) => {
-      if (r.id !== requestId) return r
-      const isNeedsPrep = r.readiness === 'Needs preparation'
-      const statusToSet = isNeedsPrep && newStatus === 'Scheduled' ? 'Draft' : newStatus
-      return {
-        ...r,
-        status: statusToSet,
-        updatedAt: new Date().toISOString(),
-      }
-    })
+  // Status transition in maintenance table (consumes reserved parts on Completed)
+  const handleMaintenanceStatusChange = (requestId, newStatus) => {
+    const target = requests.find((r) => r.id === requestId)
+    if (!target) return
+
+    const res = handleRequestStatusTransition(target, newStatus, currentUser?.name)
+    if (!res.success) {
+      showNotification('info', res.reason)
+      return
+    }
+
+    const updated = requests.map((r) => (r.id === requestId ? res.updatedReq : r))
     setRequests(updated)
     saveRequests(updated)
-  }
 
-  // Delete request from prototype queue
-  const handleDeleteRequest = (requestId) => {
-    const target = requests.find((r) => r.id === requestId)
-    const confirmed = window.confirm(
-      `Remove ${requestId} (${target?.task || 'request'}) from the maintenance queue?`
-    )
-    if (confirmed) {
-      const updated = requests.filter((r) => r.id !== requestId)
-      setRequests(updated)
-      saveRequests(updated)
-      showNotification('info', `Maintenance request ${requestId} removed from local queue.`)
+    if (newStatus === 'Completed' && target.hasConfirmedReservation && !target.partsConsumed) {
+      handleInventoryUpdated()
+      showNotification(
+        'success',
+        `${requestId} marked Completed: 1 kit of reserved parts consumed from warehouse.`
+      )
+    } else {
+      showNotification('success', `${requestId} status changed to '${newStatus}'.`)
     }
   }
 
-  // Reset seed records for hackathon demo convenience
+  // Delete maintenance request (releases reservation if active)
+  const handleDeleteRequest = (requestId) => {
+    const target = requests.find((r) => r.id === requestId)
+    const confirmed = window.confirm(
+      `Remove ${requestId} (${target?.task || 'request'}) from the prototype queue? Any active warehouse reservation will be released.`
+    )
+    if (confirmed) {
+      const updated = cancelOrDeleteMaintenanceRequest(requests, requestId, currentUser?.name)
+      setRequests(updated)
+      handleInventoryUpdated()
+      showNotification(
+        'info',
+        `Maintenance request ${requestId} removed. Warehouse reservations released.`
+      )
+    }
+  }
+
+  // Reset sample prototype requests
   const handleResetDemoRequests = () => {
     setRequests(INITIAL_SEED_REQUESTS)
     saveRequests(INITIAL_SEED_REQUESTS)
-    showNotification('success', 'Sample maintenance requests loaded.')
+    showNotification('success', 'Sample prototype maintenance requests reloaded.')
+  }
+
+  // Parts Requests Handlers
+  const handlePartsRequestCreated = (newReq) => {
+    setPartsRequests(loadPartsRequests())
+    showNotification('success', `Submitted parts request ${newReq.id} (${newReq.partName}).`)
+  }
+
+  const handleApprovePartsRequest = (requestId, plannerNote) => {
+    const res = approvePartsRequest(requestId, plannerNote, currentUser?.name)
+    if (res.success) {
+      setPartsRequests(loadPartsRequests())
+      showNotification(
+        'success',
+        `Approved parts request ${requestId}. Note: On-hand inventory is unchanged until receipt is recorded.`
+      )
+    }
+  }
+
+  const handleRejectPartsRequest = (requestId, reason) => {
+    const res = rejectPartsRequest(requestId, reason, currentUser?.name)
+    if (res.success) {
+      setPartsRequests(loadPartsRequests())
+      showNotification('info', `Rejected parts request ${requestId}.`)
+    }
+  }
+
+  const handleEditPartsRequestQty = (requestId, newQty) => {
+    const res = updatePartsRequestQty(requestId, newQty, currentUser?.name)
+    if (res.success) {
+      setPartsRequests(loadPartsRequests())
+      showNotification('success', `Updated quantity for ${requestId} to ${newQty}.`)
+    }
+  }
+
+  const handleRecordPartsReceipt = (requestId) => {
+    const res = recordPartsReceipt(requestId, currentUser?.name)
+    if (res.success) {
+      setPartsRequests(loadPartsRequests())
+      handleInventoryUpdated()
+      showNotification(
+        'success',
+        `Receipt recorded for ${requestId}: Added ${res.request.requestedQty} kit to on-hand stock at ${res.request.siteName}.`
+      )
+    } else {
+      showNotification('info', res.reason)
+    }
   }
 
   return (
@@ -246,15 +355,15 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
       {/* Header Banner */}
       <div className="page-heading">
         <div>
-          <div className="eyebrow">ASSET INTEGRITY &amp; TELEMETRY</div>
-          <h1>Equipment health</h1>
+          <div className="eyebrow">ASSET INTEGRITY, PARTS &amp; SCHEDULING</div>
+          <h1>Equipment Health &amp; Maintenance Hub</h1>
           <p>
-            Review equipment readings, service history, and maintenance requests.
+            Connected equipment health, warehouse parts availability, reorder requests, and maintenance scheduling.
           </p>
         </div>
         <div className="period">
-          Equipment coverage
-          <strong>18 Streams · 6 Sites</strong>
+          Operations Scope
+          <strong>18 Assets · 6 Sites</strong>
         </div>
       </div>
 
@@ -265,7 +374,7 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
           <div>
             <strong>HSE Pilot Hold for {activeSiteObj.name}:</strong>
             <span>
-              {activeSiteObj.criticalActions} critical actions require verified supervisor closure before this site pilot can start.
+              {activeSiteObj.criticalActions} critical HSE action(s) open. Open critical actions block site pilot work until verified supervisor closure. Prototype parts reservations and requests serve as planning records only.
             </span>
           </div>
         </div>
@@ -275,7 +384,7 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
           <div>
             <strong>Operations HSE Context:</strong>
             <span>
-              {totalCriticalHSE} critical actions open. Affected site pilots require verified supervisor closure.
+              {totalCriticalHSE} critical HSE actions currently open across 3 sites (Mesa, Arroyo, Prairie). Open critical actions block pilot work at affected sites. Prototype planning requests do not authorize field work.
             </span>
           </div>
         </div>
@@ -400,7 +509,7 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
           return (
             <article
               key={asset.id}
-              className={`equipment-card ${isWarning ? 'has-warning' : isStopped ? 'is-stopped' : asset.status === 'optimal' ? 'is-optimal' : ''}`}
+              className={`equipment-card ${isWarning ? 'has-warning' : isStopped ? 'is-stopped' : 'is-optimal'}`}
             >
               {/* Card Header */}
               <div className="equip-card-header">
@@ -413,7 +522,7 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
                   <h3 className="equip-title">{asset.type}</h3>
                 </div>
 
-                <div className={`status-pill ${asset.status}`} title={asset.statusReason}>
+                <div className={`status-pill ${asset.status}`}>
                   {isWarning ? (
                     <>
                       <AlertTriangle size={12} />
@@ -423,11 +532,6 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
                     <>
                       <Clock3 size={12} />
                       <span>Stopped</span>
-                    </>
-                  ) : asset.status === 'unavailable' ? (
-                    <>
-                      <Clock3 size={12} />
-                      <span>Unavailable</span>
                     </>
                   ) : (
                     <>
@@ -544,16 +648,28 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
                 </div>
               </div>
 
-              {/* Card Action Button: Opens the Schedule Maintenance Modal */}
+              {/* Dual Card Actions: Check Parts & Schedule Maintenance */}
               <div className="equip-card-footer">
-                <button
-                  type="button"
-                  className={`schedule-btn ${isWarning ? 'btn-warn' : 'btn-normal'}`}
-                  onClick={() => handleOpenScheduleModal(asset)}
-                >
-                  <Wrench size={13} />
-                  <span>Schedule maintenance</span>
-                </button>
+                <div className="card-actions-row">
+                  <button
+                    type="button"
+                    className="parts-check-btn"
+                    onClick={() => handleOpenPartsModal(asset)}
+                    title="Check sample warehouse parts availability and reservations"
+                  >
+                    <Package size={13} />
+                    <span>Check parts</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`schedule-btn ${isWarning ? 'btn-warn' : 'btn-normal'}`}
+                    onClick={() => handleOpenScheduleModal(asset)}
+                  >
+                    <Wrench size={13} />
+                    <span>Schedule maintenance</span>
+                  </button>
+                </div>
               </div>
             </article>
           )
@@ -576,24 +692,50 @@ export default function EquipmentHealthView({ data, selectedSite, onSelectSite }
         </div>
       )}
 
-      {/* Saved Maintenance Queue Section (B) */}
+      {/* Section 1: Saved Maintenance Queue */}
       <MaintenanceQueueTable
         requests={requests}
         onEditRequest={handleEditRequest}
-        onStatusChange={handleStatusChange}
+        onStatusChange={handleMaintenanceStatusChange}
         onDeleteRequest={handleDeleteRequest}
         onResetDemoRequests={handleResetDemoRequests}
         selectedSite={selectedSite}
       />
 
-      {/* Maintenance Scheduling Modal (A & C) */}
+      {/* Section 2: Reorder Requests & Replenishment Queue */}
+      <PartsRequestsTable
+        requests={partsRequests}
+        onApprove={handleApprovePartsRequest}
+        onReject={handleRejectPartsRequest}
+        onEditQty={handleEditPartsRequestQty}
+        onRecordReceipt={handleRecordPartsReceipt}
+        selectedSite={selectedSite}
+      />
+
+      {/* Parts Availability Modal */}
+      <PartsAvailabilityModal
+        isOpen={partsModalState.isOpen}
+        onClose={handleClosePartsModal}
+        asset={partsModalState.asset}
+        site={partsModalState.site}
+        inventory={inventory}
+        onInventoryUpdated={handleInventoryUpdated}
+        onPartsRequestCreated={handlePartsRequestCreated}
+        currentUser={currentUser}
+      />
+
+      {/* Maintenance Scheduling Modal */}
       <MaintenanceScheduleModal
-        isOpen={modalState.isOpen}
-        onClose={handleCloseModal}
+        isOpen={scheduleModalState.isOpen}
+        onClose={handleCloseScheduleModal}
         onSave={handleSaveRequest}
-        asset={modalState.asset}
-        site={modalState.site}
-        initialData={modalState.initialData}
+        asset={scheduleModalState.asset}
+        site={scheduleModalState.site}
+        initialData={scheduleModalState.initialData}
+        inventory={inventory}
+        onInventoryUpdated={handleInventoryUpdated}
+        onOpenPartsModal={handleOpenPartsModal}
+        currentUser={currentUser}
       />
     </div>
   )

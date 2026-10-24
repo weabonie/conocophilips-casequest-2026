@@ -1844,3 +1844,666 @@
     align-items: flex-start;
   }
 }
+
+/* ============================================================
+   Parts Availability, Reorder Requests, and Readiness Workflow
+   ============================================================ */
+
+/* Card Footer Action Row */
+.card-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.parts-check-btn {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 11px;
+  font-weight: 550;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.parts-check-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.card-actions-row .schedule-btn {
+  flex: 1.2;
+}
+
+/* Parts Availability Modal */
+.parts-modal-dialog {
+  max-width: 660px;
+}
+
+.parts-modal-body {
+  gap: 16px;
+  max-height: calc(88vh - 130px);
+}
+
+.part-selection-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.part-pill-btn {
+  padding: 6px 11px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 10.5px;
+  color: #334155;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s;
+}
+
+.part-pill-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.part-pill-btn.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.1);
+}
+
+.part-pill-btn small {
+  color: #64748b;
+  font-size: 9.5px;
+}
+
+/* Stock Metrics Strip */
+.inventory-metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.inv-metric-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.inv-metric-box.highlight {
+  background: #ffffff;
+  border-color: #93c5fd;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08);
+}
+
+.inv-metric-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 600;
+  display: block;
+}
+
+.inv-metric-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 2px 0 0;
+  display: block;
+}
+
+.inv-metric-box small {
+  font-size: 9px;
+  color: #64748b;
+}
+
+/* Active Reservation Card */
+.active-reservation-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 6px;
+}
+
+.res-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: #065f46;
+}
+
+.res-card-left strong {
+  display: block;
+  font-size: 11px;
+}
+
+.res-card-left span {
+  font-size: 10px;
+  opacity: 0.95;
+}
+
+/* Reservation Action Bar */
+.reservation-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  flex-wrap: wrap;
+}
+
+.required-qty-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.qty-input {
+  width: 52px;
+  padding: 5px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.unit-label {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.reservation-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Alternative Sites Inter-Site Transfer */
+.alt-sites-box {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 7px;
+  padding: 11px 14px;
+}
+
+.alt-sites-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 650;
+  color: #1d4ed8;
+  margin-bottom: 8px;
+}
+
+.alt-sites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.alt-site-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 5px;
+}
+
+.alt-site-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #1e293b;
+  flex-wrap: wrap;
+}
+
+.alt-stock-badge {
+  font-size: 9.5px;
+  font-weight: 650;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Reorder Subform */
+.reorder-subform {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 7px;
+  padding: 12px 14px;
+  margin-top: 6px;
+  animation: slide-in 0.2s ease-out;
+}
+
+.reorder-subform-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  color: #92400e;
+}
+
+.reorder-data-explanation {
+  font-size: 10px;
+  color: #92400e;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.reorder-subform-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.parts-modal-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 9.5px;
+  color: #64748b;
+}
+
+.btn-text-close {
+  background: transparent;
+  border: 0;
+  color: #92400e;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 3px;
+}
+
+.btn-text-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Compact Readiness Summary in Scheduling Modal */
+.readiness-summary-card {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.readiness-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 14px;
+}
+
+.summary-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 600;
+  display: block;
+}
+
+.summary-val {
+  font-size: 11px;
+  color: #0f172a;
+  margin-top: 2px;
+  display: block;
+}
+
+.summary-val small {
+  font-size: 9.5px;
+  color: #64748b;
+}
+
+.summary-quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #e0f2fe;
+  flex-wrap: wrap;
+}
+
+.btn-reserve-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #0284c7;
+  border: 1px solid #0284c7;
+  padding: 5px 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.btn-reserve-inline:hover {
+  background: #0369a1;
+}
+
+.btn-check-parts-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #0369a1;
+  background: #ffffff;
+  border: 1px solid #7dd3fc;
+  padding: 5px 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.btn-check-parts-inline:hover {
+  background: #e0f2fe;
+}
+
+.quick-reserve-notice {
+  font-size: 10px;
+  color: #047857;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.remaining-blockers-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #92400e;
+}
+
+.remaining-blockers-callout ul {
+  margin: 3px 0 0 16px;
+  padding: 0;
+}
+
+.remaining-blockers-callout li {
+  margin-bottom: 2px;
+}
+
+.all-clear-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #065f46;
+}
+
+/* Parts Requests Table */
+.parts-requests-panel {
+  margin-top: 30px;
+  overflow: hidden;
+}
+
+.priority-pill {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.priority-urgent {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.priority-std {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-transfer-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.data-backed-context-sub {
+  font-size: 8.5px;
+  color: #64748b;
+  display: block;
+  margin-top: 2px;
+}
+
+.btn-record-receipt {
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  color: #1d4ed8 !important;
+  font-weight: 600;
+}
+
+.btn-record-receipt:hover {
+  background: #dbeafe !important;
+}
+
+.receipt-confirmed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.btn-history-toggle {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 9px;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.12s;
+}
+
+.btn-history-toggle:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Expandable Activity History Timeline */
+.request-history-timeline {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.history-timeline-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 650;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 7px;
+}
+
+.history-entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  padding-left: 12px;
+  border-left: 2px solid #cbd5e1;
+  margin-left: 3px;
+}
+
+.history-entry-item {
+  position: relative;
+}
+
+.history-dot {
+  position: absolute;
+  left: -17px;
+  top: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 2px solid #ffffff;
+}
+
+.history-content {
+  font-size: 10px;
+}
+
+.history-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.history-action {
+  color: #0f172a;
+  font-weight: 650;
+}
+
+.history-time {
+  color: #64748b;
+  font-size: 8.5px;
+}
+
+.history-user-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+.history-note {
+  margin: 2px 0 0;
+  color: #334155;
+  font-size: 9.5px;
+  line-height: 1.35;
+}
+
+.parts-res-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.parts-res-tag.confirmed {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.parts-res-tag.unreserved {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+@media (max-width: 768px) {
+  .card-actions-row {
+    flex-direction: column;
+  }
+  .parts-modal-dialog {
+    max-width: 96%;
+  }
+  .inventory-metric-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .readiness-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -473,6 +473,7 @@ export default function App() {
               data={data}
               selectedSite={selected}
               onSelectSite={setSelected}
+              currentUser={user}
             />
             <footer className="data-footer">
               Equipment readings: 2025 · Maintenance planning
