@@ -25,7 +25,7 @@ const HOME_CONFIG = {
   },
   planner: {
     eyebrow: 'Materials control',
-    title: 'Keep critical spares ahead of demand',
+    title: 'Keep inventory ahead of demand',
     description: 'Review warnings, protect the reorder queue, and close stock exceptions.',
     action: { label: 'Open reorder queue', href: '#/reorders' },
     widgetKeys: ['earlyWarning', 'reorders'],

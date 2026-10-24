@@ -15,7 +15,7 @@ export default function Screen() {
   const actors = [...new Map(visible.map(e => [e.actor?.id, e.actor])).values()].filter(Boolean)
   const update = (key, value) => setFilters(old => ({ ...old, [key]: value }))
   function download() {
-    try { const csv = exportActivityCsv(user, events, filters); const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); const a = document.createElement('a'); a.href = url; a.download = 'critical-spares-activity.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); setError('') } catch (err) { setError(err.message) }
+    try { const csv = exportActivityCsv(user, events, filters); const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); const a = document.createElement('a'); a.href = url; a.download = 'operations-activity.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); setError('') } catch (err) { setError(err.message) }
   }
   return <div className="page-content activity-page"><PageHeader title="Activity log" subtitle="Review recorded demo decisions, people and supporting evidence."><div className="activity-header-actions">{user?.role === ROLES.OPS_MANAGER && <button onClick={() => setPreview(true)}>Monthly email preview</button>}{can(user, ACTIONS.EXPORT_ACTIVITY) && <button onClick={download}>Export filtered CSV ({rows.length})</button>}</div></PageHeader>
     <p className="activity-muted">Saved in this browser, up to 2,000 entries. The timeline is read-only here; demo reset clears it. It is not a regulated audit archive.</p>

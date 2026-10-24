@@ -179,7 +179,7 @@ export default function Overview() {
                     <dd><SourceValue table="sites" filter={{ siteId: selected }}>{sum('technicians')}</SourceValue></dd>
                   </div>
                   <div>
-                    <dt>Critical spare fill rate</dt>
+                    <dt>Inventory fill rate</dt>
                     <dd>{active ? <SourceValue table="sites" filter={{ siteId: selected }}>{active.spareFill}%</SourceValue> : 'Select a site'}</dd>
                   </div>
                   <div>

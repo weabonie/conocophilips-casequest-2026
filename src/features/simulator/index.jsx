@@ -24,7 +24,7 @@ export default function Simulator() {
   const eventSource = { label: 'Selected unplanned events: avoided hours = stage hours × combined reductions; avoided margin = event loss × avoided / stopped hours', columns: [{key:'id',label:'Event'}, {key:'siteId',label:'Site'}, {key:'cause',label:'Cause'}, {key:'stages',label:'Original stage hours'}, {key:'protectedRepairHours',label:'Protected repair hours'}, {key:'stoppedHours',label:'Stopped hours'}, {key:'lossUsd',label:'Lost margin'}], rows: data.events.filter(e => e.type === 'Unplanned' && validScenario.siteIds.includes(e.siteId)) }
   const costSource = { label: 'Scenario cost ledger: setup + full annual cost; shared prerequisites charged once', columns: [{key:'key',label:'Scope'}, {key:'label',label:'Item'}, {key:'setupUsd',label:'Setup USD'}, {key:'annualUsd',label:'Annual USD'}, {key:'hours',label:'Person-hours'}], rows: result?.costs || [] }
   return <div className="page-content simulator-page">
-    <PageHeader title="Impact simulator" subtitle="Compare scheduling, spares and equipment options against the 2025 event history." />
+    <PageHeader title="Impact simulator" subtitle="Compare scheduling, inventory and equipment options against the 2025 event history." />
     <Banner>These are modeled avoided downtime hours and contribution margin, not prevented failures or realized savings. Protected isolation and repair time stays intact.</Banner>
     {!permitted ? <PermissionNote>Scenario modeling is available to planners, site leads and operations managers.</PermissionNote> : <>
       <section className="panel simulator-controls" aria-label="Scenario controls">

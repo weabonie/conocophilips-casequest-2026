@@ -28,7 +28,7 @@ export default function HowItWorks() {
   return (
     <section className="how-it-works" aria-labelledby="how-it-works-title">
       <header className="how-it-works-header">
-        <div><p className="how-it-works-eyebrow">Critical Spares Control Tower</p><h1 id="how-it-works-title">How it works</h1><p>From historical readings to prepared maintenance, with a person accountable for every approval.</p></div>
+        <div><p className="how-it-works-eyebrow">Dashboard</p><h1 id="how-it-works-title">How it works</h1><p>From historical readings to prepared maintenance, with a person accountable for every approval.</p></div>
         <span className="how-it-works-demo">Prototype workflow</span>
       </header>
       <div className="how-it-works-safety"><ShieldCheck size={20} aria-hidden="true" /><p><strong>Recommendations never authorize work.</strong> Planner approval and HSE release are human decisions. Confirm LOTO and isolation before work begins. Demo approvals are not real field permits.</p></div>

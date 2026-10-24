@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
 // Scan visible product components, not test fixtures or explanatory negations.
 const unsupportedClaim = /\b(?:we|the system|this platform)\s+(?:prevents?|prevented)\s+(?:failures|injuries)\b|\bwill fail (?:within|in|on)\b/i
@@ -15,7 +16,7 @@ async function productFiles(directory) {
 }
 test('product language avoids unsupported outcome guarantees',async()=>{
  const violations=[]
- for(const file of await productFiles(new URL('../',import.meta.url).pathname))if(unsupportedClaim.test(await readFile(file,'utf8')))violations.push(file)
+ for(const file of await productFiles(fileURLToPath(new URL('../',import.meta.url))))if(unsupportedClaim.test(await readFile(file,'utf8')))violations.push(file)
  assert.deepEqual(violations,[])
 })
 test('language guard distinguishes guarantees from modeled avoided-downtime limits',()=>{

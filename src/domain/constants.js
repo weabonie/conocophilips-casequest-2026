@@ -1,5 +1,5 @@
 // Roadmap decisions D1 and D7: named rollout estimates, not measured savings.
-export const PRODUCT_NAME = 'Critical Spares Control Tower'
+export const PRODUCT_NAME = 'Dashboard'
 export const FILL_TARGET_PCT = 90
 export const FULL_YEAR_BENEFIT_USD = 842000
 export const YEAR_ONE_BENEFIT_USD = 721000
