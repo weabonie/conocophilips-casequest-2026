@@ -1,0 +1,268 @@
+/* Mock Login Screen Styles matching Lone Mesa Dashboard design */
+.login-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
+  color: #111827;
+  position: relative;
+  overflow-x: hidden;
+  font-size: 13px;
+}
+
+/* Background schematic grid matching site map */
+.login-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.login-bg svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.login-terrain {
+  fill: none;
+  stroke: #cbd5e1;
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+/* Minimal Topbar */
+.login-topbar {
+  height: 65px;
+  padding: 0 36px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-brand .brand-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: #111827;
+}
+
+.login-topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Main Container */
+.login-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px 40px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Card */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px -2px rgba(17, 24, 39, 0.04), 0 1px 3px rgba(17, 24, 39, 0.02);
+  padding: 32px 28px 28px;
+  margin: auto 0;
+}
+
+.login-card-header {
+  margin-bottom: 24px;
+}
+
+.login-card-brand {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.login-card-header .eyebrow {
+  margin-bottom: 6px;
+}
+
+.login-card-header h1 {
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin: 0 0 7px;
+  font-weight: 650;
+  color: #111827;
+}
+
+.login-card-header p {
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+  font-size: 11px;
+}
+
+/* Form Styles */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.2px;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 11px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.input-wrap input {
+  width: 100%;
+  height: 38px;
+  padding: 0 11px 0 35px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+
+.input-wrap input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: 0;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-toggle:hover {
+  color: #4b5563;
+}
+
+/* Options */
+.form-options {
+  display: flex;
+  align-items: center;
+  margin-top: -2px;
+  font-size: 10.5px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: #2563eb;
+  cursor: pointer;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+}
+
+/* Action button */
+.btn-primary-login {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+  margin-top: 4px;
+}
+
+.btn-primary-login:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.btn-primary-login:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Page footer */
+.login-page-footer {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .login-topbar {
+    height: 52px;
+    padding: 0 16px;
+  }
+  .login-main {
+    padding: 20px 14px 28px;
+  }
+  .login-card {
+    padding: 24px 20px;
+  }
+  .login-card-header h1 {
+    font-size: 20px;
+  }
+}

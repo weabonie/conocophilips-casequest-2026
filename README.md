@@ -14,3 +14,21 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+## Microsoft 365 / SharePoint Live Excel Sync
+
+This project supports live, periodic synchronization with your online Microsoft Excel (`CaseQuest2026Dataset.xlsx`) file on SharePoint / OneDrive for Business.
+
+### How it works
+1. **Periodic Background Polling**: The dashboard checks for newer data every 2 minutes (customizable to 1m, 5m, 10m, or manual).
+2. **One-Click Manual Sync**: Click the refresh icon next to the "Live" badge in the top bar to pull updates immediately.
+3. **Live Sync Settings Modal**: Click the settings icon in the top bar to paste your SharePoint link, test the connection, or adjust sync frequency.
+4. **CORS-Free Backend Endpoint**: The `/api/sync-excel` endpoint fetches directly from SharePoint, cleans and normalizes dirty IDs and duplicate exports, and calculates downtime stages, causes, and financial margins.
+5. **Instant Local Fallback**: You can also drag-and-drop an `.xlsx` file right into the settings modal for zero-setup instant updates in the browser.
+
+### Getting your SharePoint Share Link
+1. Open `CaseQuest2026Dataset.xlsx` in Microsoft 365 / SharePoint.
+2. Click **Share** (top-right corner).
+3. Ensure the permission is set to **"Anyone with the link can view"** (or organizational view).
+4. Click **Copy link** and paste it into the sync settings dialog in the dashboard (or save in `.env` as `VITE_EXCEL_ONLINE_URL`).
