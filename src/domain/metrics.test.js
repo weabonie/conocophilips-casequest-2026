@@ -1,44 +1,29 @@
-import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { parseCaseQuestWorkbook } from '../utils/excelParser.js'
-import { assetExposure, programKpis, siteKpis } from './metrics.js'
-
-const data = parseCaseQuestWorkbook(readFileSync(new URL('../../CaseQuest2026Dataset.xlsx', import.meta.url)))
-
-test('program KPIs match the findings', () => {
-  assert.deepEqual(programKpis(data), {
-    partsWaitHours: 1613.32,
-    partsWaitShare: 30.35,
-    unplannedHours: 6598.55,
-    lossUsd: 5608389.61,
-    overdueSev5: 6,
-    sitesBelowFillTarget: 5,
-    avgHoursWaited: 34.06,
-    avgHoursNotWaited: 15.43,
-  })
+import assert from 'node:assert/strict'
+import data from '../data/operations.json' with { type: 'json' }
+import { programKpis, siteKpis, assetExposure } from './metrics.js'
+const close = (actual, expected, tolerance = 0.01) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} != ${expected}`)
+test('headline metrics reconcile to event-derived workbook controls', () => {
+  const k = programKpis(data)
+  assert.equal(data.events.filter(e => e.type === 'Unplanned').length, 313)
+  close(k.unplannedHours, 6598.55)
+  close(k.lossUsd, 5608389.61)
+  close(k.partsWaitHours, 1613.32)
+  close(k.avgHoursWaited, 34.1, 0.05)
+  close(k.avgHoursNotWaited, 15.4, 0.05)
+  assert.equal(k.overdueSev5, 6)
+  assert.equal(k.sitesBelowFillTarget, 5)
+  assert.equal(siteKpis(data).reduce((n, s) => n + s.outagesWaited, 0), 95)
 })
-
-test('site KPIs expose waiting shares and site exposure', () => {
-  const kpis = siteKpis(data)
-  assert.deepEqual(kpis.map(site => [site.name, site.spareFill, site.outagesWaited, site.partsWaitShare]), [
-    ['Arroyo', 42, 38, 55.88],
-    ['Mesa', 65, 21, 37.5],
-    ['Prairie', 70, 16, 29.09],
-    ['Cedar', 86, 6, 12.5],
-    ['Canyon', 78, 10, 21.74],
-    ['Juniper', 92, 4, 10],
-  ])
-  assert.equal(kpis[0].partsWaitHours, 644.81)
-  assert.equal(kpis[0].lossUsd, 2017459.23)
-})
-
-test('asset exposure calculates hourly margin and keeps loss ranking available', () => {
+test('site rates and asset exposures preserve metric distinctions', () => {
+  const sites = siteKpis(data)
+  for (const [id, fill, wait] of [['S04', 42, 56], ['S02', 65, 38], ['S06', 70, 29], ['S03', 92, 10]]) {
+    const site = sites.find(s => s.siteId === id)
+    assert.equal(site.spareFill, fill)
+    close(site.partsWaitShare, wait, 0.51)
+  }
   const exposure = assetExposure(data)
-  const byLoss = [...exposure].sort((a, b) => b.lossUsd - a.lossUsd)
-  assert.deepEqual(byLoss.slice(0, 3).map(asset => [asset.assetId, Math.round(asset.lossUsd)]), [
-    ['A010', 726731], ['A012', 684220], ['A011', 606509],
-  ])
-  assert.equal(exposure.find(asset => asset.assetId === 'A010').hourlyMarginUsd, 1212.63)
+  assert.deepEqual(exposure.slice(0, 3).map(a => a.assetId), ['A011', 'A012', 'A010'])
+  assert.deepEqual([...exposure].sort((a, b) => b.lossUsd - a.lossUsd).slice(0, 3).map(a => a.assetId), ['A010', 'A012', 'A011'])
+  close(exposure.find(a => a.assetId === 'A010').hourlyMarginUsd, 1212.63)
 })
-

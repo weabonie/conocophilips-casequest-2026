@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx/xlsx.mjs'
+
 import { DEFAULT_RULE, detectAlerts } from '../domain/earlyWarning.js'
 
 export const PARSER_VERSION = 3
@@ -270,15 +271,6 @@ export function parseCaseQuestWorkbook(buffer, { asOf, includeCleanedTables = fa
     return row
   }, true)
 
-  const cleaningLog = rows('Cleaning_Log', row => `${row.date}_${row.sheet}_${row.raw}_${row.fixed}`, row => ({
-    date: date(row.date, 'Cleaning_Log', row.sheet || '(unknown)', 'date', true).slice(0, 10),
-    sheet: text(row.sheet),
-    cells: text(row['cell(s)']),
-    issue: text(row['issue found']),
-    raw: row['raw value'],
-    fixed: row['fixed value / action'],
-  }), true)
-
   const observationAsOf = readings.reduce((latest, row) => row.received_utc > latest ? row.received_utc : latest, '')
   const cutoff = asOf == null ? observationAsOf : date(asOf, 'Readings', 'snapshot', 'asOf', true)
   const eligibleReadings = readings.filter(row => row.received_utc <= cutoff && row.observed_utc <= cutoff)
@@ -293,7 +285,6 @@ export function parseCaseQuestWorkbook(buffer, { asOf, includeCleanedTables = fa
     const p = productionMap.get(`${event.asset_id}_${event.start_utc.slice(0, 7)}`)
     event.net_bbl = event.lost_oil_bbl * (1 - event.recoverable_fraction)
     event.contribution_loss = event.net_bbl * (p.price_usd_bbl - p.variable_cost_usd_bbl)
-    event.parts_wait_loss = event.stopped_hours ? event.contribution_loss * event.parts_wait_hours / event.stopped_hours : 0
   }
   const sites = [...siteMap.keys()].sort().map(siteId => {
     const meta = siteMap.get(siteId)
@@ -309,36 +300,37 @@ export function parseCaseQuestWorkbook(buffer, { asOf, includeCleanedTables = fa
       const currentTemp = valid ? latest.temperature_c : null
       const note = valid ? text(latest.inspection_note) : ''
       const stale = latest ? Date.parse(cutoff) - Date.parse(latest.observed_utc) > 48 * 3600000 : true
-      const elevated = (currentVib != null && asset.vibration_normal_mm_s > 0 && currentVib >= asset.vibration_normal_mm_s * DEFAULT_RULE.vibMultiplier)
-        || (currentTemp != null && currentTemp >= asset.temperature_normal_c + DEFAULT_RULE.tempDeltaC)
+      const elevatedVib = currentVib != null && asset.vibration_normal_mm_s > 0 && currentVib >= asset.vibration_normal_mm_s * DEFAULT_RULE.vibMultiplier
+      const elevated = elevatedVib || (currentTemp != null && asset.temperature_normal_c != null && currentTemp >= asset.temperature_normal_c + DEFAULT_RULE.tempDeltaC)
       const status = !valid || stale ? 'unavailable' : latest.operating_state === 'Stopped' ? 'stopped'
         : latest.operating_state !== 'Running' || currentVib == null || currentTemp == null || !asset.vibration_normal_mm_s ? 'unavailable'
           : elevated ? 'warning' : 'optimal'
       const historyAbnormal = history.filter(row => row.quality === 'Valid' && row.operating_state === 'Running'
-        && ((row.vibration_mm_s != null && asset.vibration_normal_mm_s > 0 && row.vibration_mm_s >= asset.vibration_normal_mm_s * DEFAULT_RULE.vibMultiplier)
-          || (row.temperature_c != null && row.temperature_c >= asset.temperature_normal_c + DEFAULT_RULE.tempDeltaC))).length
+        && ((row.vibration_mm_s != null && asset.vibration_normal_mm_s > 0 && row.vibration_mm_s >= asset.vibration_normal_mm_s * DEFAULT_RULE.vibMultiplier) || (row.temperature_c != null && asset.temperature_normal_c != null && row.temperature_c >= asset.temperature_normal_c + DEFAULT_RULE.tempDeltaC))).length
       const assetEvents = siteEvents.filter(row => row.asset_id === asset.asset_id)
       return {
         id: asset.asset_id, siteId, siteName: meta.site_name, type: asset.asset_type,
         criticality: asset.criticality, ageYears: asset.age_years,
+        capacityBblHr: asset.modeled_capacity_bbl_hr, replacementUsd: asset.replacement_usd,
+        partsWaitUsd: round(assetEvents.reduce((sum, e) => sum + (e.stopped_hours ? e.contribution_loss * e.parts_wait_hours / e.stopped_hours : 0), 0)),
         vibNormal: asset.vibration_normal_mm_s, tempNormal: asset.temperature_normal_c,
         currentVib: round(currentVib), currentTemp: round(currentTemp), status,
-        statusReason: status === 'unavailable' ? 'Missing, suspect, incomplete, or stale snapshot; review source data'
-          : status === 'warning' ? 'Latest valid snapshot exceeds the D2 vibration or temperature rule'
-            : status === 'stopped' ? 'Stopped in latest valid snapshot' : 'Within the prototype vibration rule in latest valid snapshot',
+        statusReason: status === 'unavailable' ? 'Missing, suspect, incomplete, or stale snapshot'
+          : status === 'warning' ? 'Vibration or temperature threshold met'
+            : status === 'stopped' ? 'Stopped in latest valid snapshot' : 'Below vibration and temperature thresholds',
         abnormalCount: historyAbnormal, latestNote: note,
         observedUtc: latest?.observed_utc || null, receivedUtc: latest?.received_utc || null,
         readingQuality: latest?.quality || 'Missing', operatingState: latest?.operating_state || null,
         isStale: stale, isHistorical: true,
         events: assetEvents.length, hours: round(assetEvents.reduce((sum, row) => sum + row.stopped_hours, 0)),
         partsHours: round(assetEvents.reduce((sum, row) => sum + row.parts_wait_hours, 0)), loss: total(assetEvents, 'contribution_loss'),
-        capacityBblHr: asset.modeled_capacity_bbl_hr, replacementUsd: asset.replacement_usd,
-        partsWaitUsd: round(assetEvents.reduce((sum, row) => sum + row.parts_wait_loss, 0)),
       }
     }).sort((a, b) => b.partsHours - a.partsHours)
     const causeNames = [...new Set(siteEvents.map(row => row.cause))]
     return {
       id: siteId, name: meta.site_name, spareFill: meta.spare_fill_pct, technicians: meta.technicians, network: meta.network_uptime_pct,
+      availableProjectHours: meta.available_project_hours, trainingHoursPerPerson: meta.training_hours_per_person,
+      edgeSetupUsd: meta.edge_setup_usd, edgeAnnualUsd: meta.edge_annual_usd, cleanupSetupUsd: meta.cleanup_setup_usd,
       criticalActions: siteHse.filter(row => row.potential_severity === 5).length, openActions: siteHse.length,
       events: siteEvents.length, hours: total(siteEvents, 'stopped_hours'), netBbl: total(siteEvents, 'net_bbl'), loss: total(siteEvents, 'contribution_loss'),
       stages: Object.fromEntries(STAGES.map(stage => [stage, total(siteEvents, `${stage}_hours`)])),
@@ -348,167 +340,86 @@ export function parseCaseQuestWorkbook(buffer, { asOf, includeCleanedTables = fa
       }).sort((a, b) => b.hours - a.hours), assets: equipment,
     }
   })
-
-  const eventsContract = events.map(event => {
-    const asset = assetMap.get(event.asset_id)
-    return {
-      id: event.event_id,
-      assetId: event.asset_id,
-      siteId: asset.site_id,
-      type: event.event_type,
-      cause: event.cause,
-      startUtc: event.start_utc,
-      endUtc: event.end_utc,
-      stages: {
-        detect: round(event.detect_hours),
-        dispatch: round(event.dispatch_hours),
-        partsWait: round(event.parts_wait_hours),
-        repair: round(event.repair_hours),
-        restart: round(event.restart_hours),
-      },
-      stoppedHours: round(event.stopped_hours),
-      protectedRepairHours: round(event.protected_repair_hours),
-      lostOilBbl: round(event.lost_oil_bbl),
-      unrecoveredBbl: round(event.net_bbl),
-      lossUsd: round(event.contribution_loss),
-      partsWaitUsd: round(event.parts_wait_loss),
-      partsUsd: event.parts_usd == null ? null : round(event.parts_usd),
-      costStatus: text(event.cost_status),
-      workOrderId: event.work_order_id,
-    }
-  })
-
-  const readingsContract = Object.fromEntries([...assetMap.keys()].sort().map(assetId => [assetId, []]))
-  for (const row of readings) {
-    const valid = row.quality === 'Valid'
-    const compactReading = {
-      date: row.observed_utc.slice(0, 10),
-      observedUtc: row.observed_utc,
-      receivedUtc: row.received_utc,
-      lagHours: round((Date.parse(row.received_utc) - Date.parse(row.observed_utc)) / 3600000),
-      vib: valid && row.vibration_mm_s != null ? round(row.vibration_mm_s) : null,
-      temp: valid && row.temperature_c != null ? round(row.temperature_c) : null,
-      state: row.operating_state || null,
-      quality: row.quality,
-    }
-    const note = text(row.inspection_note)
-    if (note) compactReading.note = note
-    readingsContract[row.asset_id].push(compactReading)
-  }
-
-  const hseActions = hse.map(row => {
-    const statusAsOf = row.status_as_of.slice(0, 10)
-    const dueDate = row.due_date.slice(0, 10)
-    const daysOverdue = row.action_status === 'Open'
-      ? Math.max(0, Math.floor((Date.parse(statusAsOf) - Date.parse(dueDate)) / 86400000))
-      : null
-    return {
-      id: row.hse_id,
-      siteId: row.site_id,
-      assetId: row.asset_id,
-      eventId: row.event_id,
-      hazard: row.hazard,
-      severity: row.potential_severity,
-      status: row.action_status,
-      owner: row.action_owner,
-      dueDate,
-      closedDate: row.closed_date ? row.closed_date.slice(0, 10) : null,
-      daysOverdue,
-      setupUsd: round(row.action_setup_usd),
-      annualUsd: round(row.action_annual_usd),
-      personHours: round(row.action_person_hours),
-      statusAsOf,
-    }
-  })
-
-  const solutionsContract = solutions.map(row => ({
-    id: row.option_id,
-    name: row.option_name,
-    unit: row.billing_unit,
-    setupUsd: round(row.setup_usd),
-    annualUsd: round(row.annual_usd),
-    leadMonths: row.lead_months,
-    installHours: row.install_person_hours,
-    applicableTypes: text(row.applicable_types).split(';').map(value => value.trim()).filter(Boolean),
-    prerequisites: text(row.prerequisite).split(';').map(value => value.trim()).filter(Boolean),
-    eligibleCauses: /^all(?: unplanned)?$/i.test(text(row.eligible_causes)) ? 'all'
-      : text(row.eligible_causes).split(';').map(value => value.trim()).filter(Boolean),
-    fractions: Object.fromEntries(STAGES.map(stage => [stage === 'parts_wait' ? 'partsWait' : stage, {
-      low: row[`${stage}_low`], base: row[`${stage}_base`], high: row[`${stage}_high`],
-    }])),
-  }))
-
-  const bySite = Object.fromEntries([...siteMap.keys()].sort().map(siteId => {
-    const siteReadings = readings.filter(row => assetMap.get(row.asset_id).site_id === siteId)
-    const missing = siteReadings.filter(row => row.quality === 'Missing').length
-    const suspect = siteReadings.filter(row => row.quality === 'Suspect').length
-    const lateHours = siteReadings
-      .map(row => (Date.parse(row.received_utc) - Date.parse(row.observed_utc)) / 3600000)
-      .filter(hours => hours > 6)
-    const pct = count => siteReadings.length ? Math.round(count / siteReadings.length * 1000) / 10 : 0
-    return [siteId, {
-      readings: siteReadings.length,
-      valid: siteReadings.filter(row => row.quality === 'Valid').length,
-      missing,
-      suspect,
-      late: lateHours.length,
-      missingPct: pct(missing),
-      suspectPct: pct(suspect),
-      latePct: pct(lateHours.length),
-      avgLateHours: lateHours.length ? round(lateHours.reduce((sum, hours) => sum + hours, 0) / lateHours.length) : 0,
-    }]
-  }))
-
-  const eventHistoryByAsset = Object.fromEntries(assets.map(asset => [asset.asset_id, eventsContract
-    .filter(event => event.assetId === asset.asset_id && event.type === 'Unplanned')
-    .map(event => ({ id: event.id, cause: event.cause, startUtc: event.startUtc }))]))
-  const normalizedAssets = Object.fromEntries(assets.map(asset => [asset.asset_id, {
-    id: asset.asset_id,
-    siteId: asset.site_id,
-    vibNormal: asset.vibration_normal_mm_s,
-    tempNormal: asset.temperature_normal_c,
-    eventHistory: eventHistoryByAsset[asset.asset_id],
-  }]))
-  const warningAlerts = Object.entries(readingsContract).flatMap(([assetId, history]) => {
-    const asset = normalizedAssets[assetId]
-    return detectAlerts(history, asset, DEFAULT_RULE)
-  })
-  const causeTotals = Object.fromEntries(['Bearing wear', 'Seal leak', 'Electrical trip', 'Process upset', 'Unknown'].map(cause => [cause, {
-    flagged: new Set(warningAlerts.filter(alert => {
-      const event = eventsContract.find(candidate => candidate.id === alert.precededEventId)
-      return event?.cause === cause
-    }).map(alert => alert.precededEventId)).size,
-    total: unplanned.filter(event => event.cause === cause).length,
-  }]))
-  const warningSummary = {
-    alerts: warningAlerts.length,
-    falseAlarms: warningAlerts.filter(alert => !alert.precededEventId).length,
-    flaggedByCause: causeTotals,
-    // Findings describe this replay at day-level precision, so summarize the exact median upward to the next day.
-    medianLeadDays: warningAlerts.length
-      ? Math.ceil([...warningAlerts].map(alert => alert.leadDays).filter(value => value != null).sort((a, b) => a - b)[Math.floor(warningAlerts.length / 2)] || 0)
-      : null,
-  }
   const dates = production.map(row => row.month.slice(0, 10)).sort()
   dataQuality.remainingUnknowns = {
     partsInvoices: events.filter(row => row.parts_usd == null).length,
     missingReadings: readings.filter(row => row.quality === 'Missing').length,
     suspectReadings: readings.filter(row => row.quality === 'Suspect').length,
   }
-  dataQuality.bySite = bySite
   const result = {
     parserVersion: PARSER_VERSION, source: 'CaseQuest2026Dataset.xlsx (parsed workbook)',
     period: dates[0]?.slice(0, 4) === dates.at(-1)?.slice(0, 4) ? `${dates[0]?.slice(0, 4)} historical data` : `${dates[0]} to ${dates.at(-1)}`,
     hseAsOf: hseDates[0]?.slice(0, 10) || null, lastSyncTime: new Date().toISOString(),
-    sensorAsOf: cutoff || null, sensorRules: { vibrationMultiplier: DEFAULT_RULE.vibMultiplier, temperatureDeltaC: DEFAULT_RULE.tempDeltaC, lookbackDays: DEFAULT_RULE.lookbackDays, staleAfterHours: 48 },
+    sensorAsOf: cutoff || null, sensorRules: { vibrationMultiplier: DEFAULT_RULE.vibMultiplier, temperatureDeltaC: DEFAULT_RULE.tempDeltaC, staleAfterHours: 48, validatedAlarmThreshold: false },
     dataQuality, sites, equipment: sites.flatMap(site => site.assets),
-    events: eventsContract,
-    readings: readingsContract,
-    hseActions,
-    solutions: solutionsContract,
-    cleaningLog,
-    earlyWarning: { rule: DEFAULT_RULE, alerts: warningAlerts, summary: warningSummary },
   }
-  if (includeCleanedTables) result.cleanedTables = { Assets: assets, Events: events, Production: production, Readings: readings, HSE: hse, Solutions: solutions, Cleaning_Log: cleaningLog }
+  result.events = events.map(e => ({
+    id: e.event_id, assetId: e.asset_id, siteId: assetMap.get(e.asset_id).site_id,
+    type: e.event_type, cause: e.cause, startUtc: e.start_utc.replace('.000Z', 'Z').replace(':00Z', 'Z'), endUtc: e.end_utc.replace('.000Z', 'Z').replace(':00Z', 'Z'),
+    stages: { detect: e.detect_hours, dispatch: e.dispatch_hours, partsWait: e.parts_wait_hours, repair: e.repair_hours, restart: e.restart_hours },
+    stoppedHours: e.stopped_hours, protectedRepairHours: e.protected_repair_hours, lostOilBbl: e.lost_oil_bbl,
+    unrecoveredBbl: Number(e.net_bbl.toFixed(4)), lossUsd: Number(e.contribution_loss.toFixed(4)),
+    partsWaitUsd: e.stopped_hours ? Number((e.contribution_loss * e.parts_wait_hours / e.stopped_hours).toFixed(4)) : 0,
+    partsUsd: e.parts_usd, costStatus: text(e.cost_status), workOrderId: e.work_order_id,
+  }))
+  // ISO strings retain observed and received instants; precision is rounded to seconds for daily snapshots.
+  const compactDate = value => new Date(Math.round(Date.parse(value) / 1000) * 1000).toISOString().replace('.000Z', 'Z').replace(':00Z', 'Z')
+  result.readings = Object.fromEntries(assets.map(a => [a.asset_id, []]))
+  dataQuality.bySite = Object.fromEntries([...siteMap.keys()].map(id => [id, { readings: 0, valid: 0, missing: 0, suspect: 0, late: 0, missingPct: 0, suspectPct: 0, latePct: 0, avgLateHours: null }]))
+  for (const r of readings) {
+    const lagHours = (Date.parse(r.received_utc) - Date.parse(r.observed_utc)) / 3600000
+    result.readings[r.asset_id].push({ date: r.observed_utc.slice(0, 10), observedUtc: compactDate(r.observed_utc), receivedUtc: compactDate(r.received_utc),
+      lagHours: round(lagHours), vib: r.quality === 'Valid' ? round(r.vibration_mm_s) : null,
+      temp: r.quality === 'Valid' ? round(r.temperature_c) : null, state: r.operating_state,
+      quality: r.quality, note: text(r.inspection_note) })
+    const q = dataQuality.bySite[assetMap.get(r.asset_id).site_id]
+    q.readings++
+    q[r.quality.toLowerCase()]++
+    if (lagHours > 6) { q.late++; q.avgLateHours = (q.avgLateHours || 0) + lagHours }
+  }
+  for (const q of Object.values(dataQuality.bySite)) {
+    for (const key of ['missing', 'suspect', 'late']) q[`${key}Pct`] = round(q[key] / q.readings * 100)
+    q.avgLateHours = q.late ? round(q.avgLateHours / q.late) : null
+  }
+  result.hseActions = hse.map(a => ({ id: a.hse_id, siteId: a.site_id, assetId: a.asset_id, eventId: a.event_id,
+    hazard: text(a.hazard), severity: a.potential_severity, status: a.action_status, owner: text(a.action_owner),
+    dueDate: a.due_date.slice(0, 10), closedDate: a.closed_date?.slice(0, 10) || null,
+    daysOverdue: a.action_status === 'Closed' ? null : Math.max(0, Math.floor((Date.parse(a.status_as_of) - Date.parse(a.due_date)) / 86400000)),
+    setupUsd: a.action_setup_usd, annualUsd: a.action_annual_usd, personHours: a.action_person_hours, statusAsOf: a.status_as_of.slice(0, 10) }))
+  const list = value => text(value).split(';').map(v => v.trim()).filter(Boolean)
+  result.solutions = solutions.map(o => ({ id: o.option_id, name: text(o.option_name), unit: text(o.billing_unit),
+    setupUsd: o.setup_usd, annualUsd: o.annual_usd, leadMonths: o.lead_months, installHours: o.install_person_hours,
+    applicableTypes: /^all$/i.test(text(o.applicable_types)) ? [...new Set(assets.map(a => a.asset_type))] : list(o.applicable_types),
+    prerequisites: list(o.prerequisite), eligibleCauses: /all/i.test(text(o.eligible_causes)) ? 'all' : list(o.eligible_causes),
+    fractions: Object.fromEntries(STAGES.map(stage => [stage === 'parts_wait' ? 'partsWait' : stage, Object.fromEntries(['low', 'base', 'high'].map(level => [level, o[`${stage}_${level}`]]))])) }))
+  result.cleaningLog = wb.Sheets.Cleaning_Log ? XLSX.utils.sheet_to_json(wb.Sheets.Cleaning_Log, { defval: null }).map(row => ({
+    date: date(row.Date, 'Cleaning_Log', '', 'Date')?.slice(0, 10) || null, sheet: text(row.Sheet), cells: text(row['Cell(s)']),
+    issue: text(row['Issue found']), raw: row['Raw value'], fixed: row['Fixed value / action'],
+  })) : []
+  const alerts = result.equipment.flatMap(asset => detectAlerts(result.readings[asset.id], {
+    ...asset, history: result.events.filter(e => e.assetId === asset.id),
+  }))
+  const flaggedByCause = Object.fromEntries([...new Set(unplanned.map(e => e.cause))].map(cause => [cause, { flagged: 0, total: unplanned.filter(e => e.cause === cause).length }]))
+  const flagged = new Set()
+  for (const alert of alerts) {
+    const event = result.events.filter(e => e.assetId === alert.assetId && e.type === 'Unplanned'
+      && Date.parse(e.startUtc) > Date.parse(alert.observedUtc)
+      && Date.parse(e.startUtc) - Date.parse(alert.observedUtc) <= DEFAULT_RULE.lookbackDays * 86400000
+      && Date.parse(alert.receivedUtc) <= Date.parse(e.startUtc)).sort((a, b) => a.startUtc.localeCompare(b.startUtc))[0]
+    if (event) {
+      alert.precededEventId = event.id
+      alert.leadDays = round((Date.parse(event.startUtc) - Date.parse(alert.observedUtc)) / 86400000)
+      if (!flagged.has(event.id)) { flagged.add(event.id); flaggedByCause[event.cause].flagged++ }
+    }
+  }
+  for (const alert of alerts) {
+    alert.vibRatio = round(alert.vibRatio)
+    alert.tempDeltaC = round(alert.tempDeltaC)
+    delete alert.observedUtc
+    delete alert.receivedUtc
+  }
+  result.earlyWarning = { rule: { ...DEFAULT_RULE }, alerts, summary: { alerts: alerts.length,
+    falseAlarms: alerts.filter(a => !a.precededEventId).length, flaggedByCause } }
+  if (includeCleanedTables) result.cleanedTables = { Assets: assets, Events: events, Production: production, Readings: readings, HSE: hse, Solutions: solutions }
   return result
 }

@@ -1,1 +1,17 @@
-/* HSE gate styles are owned by the feature task. */
+.hse-gate { display: grid; gap: 16px; }
+.hse-gate-site { padding: 20px; }
+.hse-gate-site header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.hse-gate-site h2 { margin: 0; }
+.hse-gate-site p { color: var(--text-secondary, #536174); line-height: 1.5; margin: 6px 0; }
+.hse-gate-action { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-top: 1px solid var(--border-color, #e2e8f0); }
+.hse-gate-action > div { min-width: 0; overflow-wrap: anywhere; }
+.hse-gate-action button { flex-shrink: 0; }
+.hse-gate-stamp { padding: 10px; background: #eff8f3; border-radius: 6px; margin-top: 8px; }
+.hse-gate-site footer { margin-top: 12px; }
+.hse-gate-form { display: grid; gap: 16px; }
+.hse-gate-form label { display: grid; gap: 8px; }
+.hse-gate-form textarea { min-height: 90px; }
+.hse-gate-form input { max-width: 100%; }
+.hse-gate-error { color: #9e2929; padding: 10px; background: #fff1f1; border-radius: 6px; }
+.hse-gate-summary { padding: 16px; }
+@media (max-width: 600px) { .hse-gate-action { flex-direction: column; } .hse-gate-site { padding: 14px; } }

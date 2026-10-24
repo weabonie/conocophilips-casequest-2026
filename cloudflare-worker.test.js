@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import worker from './cloudflare-worker.js'
+import { PARSER_VERSION } from './src/utils/excelParser.js'
 
 test('serves the bundled cleaned snapshot without a Node filesystem', async () => {
   const response = await worker.fetch(new Request('https://example.com/api/sync-excel'), {})
   const result = await response.json()
   assert.equal(response.status, 200)
   assert.equal(result.success, true)
-  assert.equal(result.data.parserVersion, 2)
+  assert.equal(result.data.parserVersion, PARSER_VERSION)
   assert.equal(result.data.sites.length, 6)
   assert.equal(result.lastSyncTime, result.data.lastSyncTime)
 })
@@ -47,4 +48,27 @@ test('reports remote sign-in pages without treating them as workbooks', async t 
   const response = await worker.fetch(new Request('https://example.com/api/sync-excel?url=https://example.com/file.xlsx'), {})
   assert.equal(response.status, 502)
   assert.match((await response.json()).error, /webpage/)
+})
+
+
+test('Copilot rejects unsupported methods, invalid questions and oversized bodies', async () => {
+  assert.equal((await worker.fetch(new Request('https://example.com/api/copilot'), {})).status, 405)
+  for (const body of ['invalid', '{}', '{"question":42}', JSON.stringify({ question: 'x'.repeat(1001) })]) {
+    const response = await worker.fetch(new Request('https://example.com/api/copilot', { method: 'POST', body }), {})
+    assert.equal(response.status, 400)
+  }
+  const response = await worker.fetch(new Request('https://example.com/api/copilot', { method: 'POST', body: JSON.stringify({ question: 'x'.repeat(5000) }) }), {})
+  assert.equal(response.status, 413)
+})
+
+test('Copilot remains offline without server authentication and never exposes credentials or fetches models', async t => {
+  let calls = 0
+  t.mock.method(globalThis, 'fetch', async () => { calls++; throw new Error('Unexpected external request') })
+  const response = await worker.fetch(new Request('https://example.com/api/copilot', { method: 'POST', body: JSON.stringify({ question: 'How exposed is Arroyo?', role: 'ops_manager', context: 'untrusted browser context' }) }), { ANTHROPIC_API_KEY: 'private-test-key', COPILOT_MODEL: 'private-model' })
+  assert.equal(response.status, 503)
+  assert.equal(response.headers.get('cache-control'), 'no-store')
+  const body = await response.text()
+  assert.match(body, /offline/)
+  assert.doesNotMatch(body, /private-test-key|private-model|untrusted browser/)
+  assert.equal(calls, 0)
 })

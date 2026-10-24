@@ -10,7 +10,6 @@ import {
   X,
   Gauge,
   Thermometer,
-  ShieldAlert,
   Package,
 } from 'lucide-react'
 import MaintenanceScheduleModal from './MaintenanceScheduleModal'
@@ -131,11 +130,6 @@ export default function EquipmentHealthView({
     if (!selectedSite || !data?.sites) return null
     return data.sites.find((s) => s.id === selectedSite)
   }, [selectedSite, data])
-
-  const totalCriticalHSE = useMemo(() => {
-    if (!data?.sites) return 0
-    return data.sites.reduce((acc, s) => acc + (s.criticalActions || 0), 0)
-  }, [data])
 
   const showNotification = (type, message) => {
     setNotification({ type, message })
@@ -355,7 +349,7 @@ export default function EquipmentHealthView({
       {/* Header Banner */}
       <div className="page-heading">
         <div>
-          <div className="eyebrow">ASSET INTEGRITY, PARTS &amp; SCHEDULING</div>
+          <div className="eyebrow">Asset Integrity, Parts &amp; Scheduling</div>
           <h1>Equipment Health &amp; Maintenance Hub</h1>
           <p>
             Connected equipment health, warehouse parts availability, reorder requests, and maintenance scheduling.
@@ -366,29 +360,6 @@ export default function EquipmentHealthView({
           <strong>18 Assets · 6 Sites</strong>
         </div>
       </div>
-
-      {/* HSE Operational Context Banner */}
-      {activeSiteObj?.criticalActions > 0 ? (
-        <div className="equipment-hse-alert hse-critical">
-          <ShieldAlert size={17} />
-          <div>
-            <strong>HSE Pilot Hold for {activeSiteObj.name}:</strong>
-            <span>
-              {activeSiteObj.criticalActions} critical HSE action(s) open. Open critical actions block site pilot work until verified supervisor closure. Prototype parts reservations and requests serve as planning records only.
-            </span>
-          </div>
-        </div>
-      ) : totalCriticalHSE > 0 && !selectedSite ? (
-        <div className="equipment-hse-alert hse-info">
-          <ShieldAlert size={16} />
-          <div>
-            <strong>Operations HSE Context:</strong>
-            <span>
-              {totalCriticalHSE} critical HSE actions currently open across 3 sites (Mesa, Arroyo, Prairie). Open critical actions block pilot work at affected sites. Prototype planning requests do not authorize field work.
-            </span>
-          </div>
-        </div>
-      ) : null}
 
       {/* Telemetry KPI Strip */}
       <section className="metric-grid" aria-label="Equipment health summary">

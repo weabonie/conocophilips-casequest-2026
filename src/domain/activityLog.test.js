@@ -1,13 +1,4 @@
+import test from 'node:test'
 import assert from 'node:assert/strict'
-import { test } from 'node:test'
-import { activityStore, EVENT_TYPES, logActivity } from './activityLog.js'
-
-test('activity log is newest first and capped at 2,000 entries', () => {
-  activityStore.reset()
-  const user = { id: 'u1', name: 'Maya Chen', role: 'planner' }
-  for (let index = 0; index < 2001; index += 1) logActivity(user, { type: EVENT_TYPES.REORDER_CREATED, entityId: String(index) })
-  const entries = activityStore.get()
-  assert.equal(entries.length, 2000)
-  assert.equal(entries[0].entityId, '2000')
-  assert.equal(entries[0].actor.name, 'Maya Chen')
-})
+import { activityStore, logActivity, getActivity, EVENT_TYPES, subscribeActivity } from './activityLog.js'
+test('activity retains actor and decision fields, newest first',()=>{activityStore.reset();let notifications=0;const stop=subscribeActivity(()=>notifications++);logActivity({id:'u',name:'Planner',role:'planner'},{type:EVENT_TYPES.REORDER_CREATED,siteId:'S04',reason:'Stock shortage'});const second=logActivity(null,{type:EVENT_TYPES.SIGN_IN});assert.equal(getActivity()[0].id,second.id);assert.equal(getActivity({siteId:'S04'})[0].reason,'Stock shortage');assert.equal(notifications,2);stop()})

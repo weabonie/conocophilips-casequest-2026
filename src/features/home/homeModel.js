@@ -17,35 +17,35 @@ const ROLE_ALIASES = {
 
 const HOME_CONFIG = {
   technician: {
-    eyebrow: 'FIELD OPERATIONS',
+    eyebrow: 'Field operations',
     title: 'Ready the next safe dispatch',
     description: 'Check the part, site context, and safety line before the crew rolls.',
     action: { label: 'Run a pre-dispatch check', href: '#/dispatch' },
     widgetKeys: ['dispatch', 'earlyWarning'],
   },
   planner: {
-    eyebrow: 'MATERIALS CONTROL',
+    eyebrow: 'Materials control',
     title: 'Keep critical spares ahead of demand',
     description: 'Review warnings, protect the reorder queue, and close stock exceptions.',
     action: { label: 'Open reorder queue', href: '#/reorders' },
     widgetKeys: ['earlyWarning', 'reorders'],
   },
   hse_supervisor: {
-    eyebrow: 'SAFETY CONTROL',
+    eyebrow: 'Safety control',
     title: 'Clear the blockers before go-live',
     description: 'Verify the actions in your site scope and release only when every blocker is closed.',
     action: { label: 'Open HSE gate', href: '#/hse' },
     widgetKeys: ['hse'],
   },
   site_lead: {
-    eyebrow: 'SITE READINESS',
+    eyebrow: 'Site readiness',
     title: 'Know whether your site is ready',
     description: 'See site status, warnings, and the releases that need attention today.',
     action: { label: 'View site status', href: '#/overview' },
     widgetKeys: ['siteStatus', 'hse', 'earlyWarning'],
   },
   ops_manager: {
-    eyebrow: 'PROGRAM CONTROL',
+    eyebrow: 'Program control',
     title: 'See where the program needs a decision',
     description: 'Review performance, safety status, and the next expansion scenario in one place.',
     action: { label: 'Open operations overview', href: '#/overview' },
@@ -82,9 +82,10 @@ export function filterDataToUserScope(data, user) {
 
   const sites = (data.sites || []).filter((site) => scope.has(site.id))
   const siteIds = new Set(sites.map((site) => site.id))
-  const assetIds = new Set(
-    sites.flatMap((site) => (site.assets || []).map((asset) => asset.id || asset.assetId))
-  )
+  const assetIds = new Set([
+    ...sites.flatMap(site => (site.assets || []).map(asset => asset.id || asset.assetId)),
+    ...(data.equipment || []).filter(asset => siteIds.has(asset.siteId)).map(asset => asset.id || asset.assetId),
+  ])
   const equipment = (data.equipment || []).filter((asset) => {
     return siteIds.has(asset.siteId) || assetIds.has(asset.id || asset.assetId)
   })

@@ -1,12 +1,3 @@
 import { resetRegisteredStores } from './store.js'
-import { INVENTORY_STORAGE_KEY, PARTS_REQUESTS_STORAGE_KEY } from '../utils/inventoryStorage.js'
-
-export function resetDemoState() {
-  resetRegisteredStores()
-  try {
-    localStorage.removeItem(INVENTORY_STORAGE_KEY)
-    localStorage.removeItem(PARTS_REQUESTS_STORAGE_KEY)
-  } catch {
-    // The persistent store reset remains safe when storage is unavailable.
-  }
-}
+const DEMO_KEYS = ['cq_prototype_inventory_v2', 'cq_prototype_parts_requests_v1', 'cq_prototype_maintenance_requests_v1', 'cq_demo_session', 'cq_activity_log', 'cq_hse_gate', 'cq_min_max', 'cq_warning_decisions', 'cq_notification_reads', 'cq_activity_filters']
+export function resetDemoState() { for (const key of DEMO_KEYS) { try { globalThis.localStorage?.removeItem(key) } catch { /* Keep sync preferences. */ } } resetRegisteredStores(); if (typeof window !== 'undefined') window.dispatchEvent(new Event('cq-demo-reset')) }

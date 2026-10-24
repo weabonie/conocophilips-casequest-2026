@@ -1,90 +1,23 @@
 import { useSyncExternalStore } from 'react'
-
-const registry = new Set()
-
-function storageKey(key, version) {
-  const normalized = String(key).startsWith('cq_') ? String(key) : `cq_${key}`
-  return `${normalized}_v${version}`
-}
-
-function getStorage() {
-  try {
-    return typeof window !== 'undefined' && window.localStorage ? window.localStorage : null
-  } catch {
-    return null
-  }
-}
-
-export function createPersistentStore({ key, version = 1, initial, register = true }) {
-  const persistedKey = storageKey(key, version)
-  let value = typeof initial === 'function' ? initial() : initial
+const stores = new Map()
+export function createPersistentStore({ key, version = 1, initial }) {
+  if (!key.startsWith('cq_')) throw new Error('Demo store keys must start with cq_')
+  if (stores.has(key)) return stores.get(key)
+  const fresh = () => structuredClone(typeof initial === 'function' ? initial() : initial)
+  const read = () => { try { const raw = globalThis.localStorage?.getItem(key); const saved = raw && JSON.parse(raw); return saved?.version === version ? saved.value : fresh() } catch { return fresh() } }
+  let value = read()
   const listeners = new Set()
-
-  try {
-    const raw = getStorage()?.getItem(persistedKey)
-    if (raw !== null) value = JSON.parse(raw)
-  } catch {
-    value = typeof initial === 'function' ? initial() : initial
-  }
-
-  const notify = () => listeners.forEach((listener) => listener())
-
+  const emit = () => listeners.forEach(fn => fn())
   const store = {
-    key: persistedKey,
+    key,
     get: () => value,
-    set: (updater) => {
-      const next = typeof updater === 'function' ? updater(value) : updater
-      value = next
-      try {
-        getStorage()?.setItem(persistedKey, JSON.stringify(next))
-      } catch {
-        // Persistence is best effort in private browsing and storage-constrained demos.
-      }
-      notify()
-      return value
-    },
-    subscribe: (listener) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
-    },
-    reset: () => {
-      value = typeof initial === 'function' ? initial() : initial
-      try {
-        getStorage()?.removeItem(persistedKey)
-      } catch {
-        // Ignore unavailable storage.
-      }
-      notify()
-    },
+    set(updater) { const next = typeof updater === 'function' ? updater(value) : updater; try { globalThis.localStorage?.setItem(key, JSON.stringify({ version, value: next })) } catch { throw new Error('Unable to save this change. Browser storage is unavailable or full.') } value = next; emit(); return value },
+    subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn) },
+    reset() { value = fresh(); try { globalThis.localStorage?.removeItem(key) } catch { /* Storage may be unavailable. */ } emit() },
   }
-
-  if (register) registry.add(store)
-
-  if (typeof window !== 'undefined') {
-    window.addEventListener('storage', (event) => {
-      if (event.key !== persistedKey) return
-      try {
-        value = event.newValue === null
-          ? (typeof initial === 'function' ? initial() : initial)
-          : JSON.parse(event.newValue)
-        notify()
-      } catch {
-        // Ignore malformed values written by an external tab.
-      }
-    })
-  }
-
+  if (typeof window !== 'undefined') window.addEventListener('storage', event => { if (event.key === key || event.key === null) { value = read(); emit() } })
+  stores.set(key, store)
   return store
 }
-
-export function useStore(store, selector = (state) => state) {
-  return useSyncExternalStore(store.subscribe, () => selector(store.get()), () => selector(store.get()))
-}
-
-export function resetRegisteredStores() {
-  registry.forEach((store) => store.reset())
-}
-
-export function getRegisteredStores() {
-  return [...registry]
-}
+export function useStore(store, selector = s => s) { return selector(useSyncExternalStore(store.subscribe, store.get, store.get)) }
+export function resetRegisteredStores() { stores.forEach(store => store.reset()) }

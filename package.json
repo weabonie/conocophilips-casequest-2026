@@ -8,12 +8,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node --test",
-    "snapshot": "node scripts/build-snapshot.mjs",
     "preview": "vite preview",
     "deploy": "wrangler deploy --config wrangler.jsonc",
     "deploy:check": "wrangler deploy --config wrangler.jsonc --dry-run",
-    "preview:cloudflare": "wrangler dev --config wrangler.jsonc"
+    "preview:cloudflare": "wrangler dev --config wrangler.jsonc",
+    "test": "node --test",
+    "snapshot": "node scripts/build-snapshot.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.61.0",

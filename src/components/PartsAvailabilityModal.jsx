@@ -1,9 +1,12 @@
+import { PermissionNote } from '../ui/index.jsx'
+import { useCurrentUser } from '../domain/auth.js'
+import { can, ACTIONS } from '../domain/permissions.js'
+import { notifyPartsChanged, createRushReorder, createTransfer } from '../domain/partsRequests.js'
 import { useState, useMemo, useEffect } from 'react'
 import {
   X,
   Package,
   Layers,
-  ShieldAlert,
   Info,
   CheckCircle2,
   AlertTriangle,
@@ -19,7 +22,6 @@ import {
   getReservationForAsset,
   reserveParts,
   releaseReservation,
-  createPartsRequest,
 } from '../utils/inventoryStorage.js'
 
 function PartsAvailabilityContent({
@@ -31,7 +33,9 @@ function PartsAvailabilityContent({
   currentUser,
   onClose,
 }) {
-  const userName = currentUser?.name || 'Operations Planner'
+  const sessionUser = useCurrentUser()
+  const actor = sessionUser || currentUser
+  const canStage = can(actor, ACTIONS.STAGE_PART, {siteId: asset.siteId || site?.id})
   const suggestedParts = useMemo(() => getSuggestedPartsForAsset(asset), [asset])
 
   const [selectedPartId, setSelectedPartId] = useState(
@@ -72,7 +76,8 @@ function PartsAvailabilityContent({
 
   // Handle Reserve Parts
   const handleReserve = () => {
-    const res = reserveParts(siteId, currentPartId, asset.id, requiredQty, userName)
+    if (!canStage) { setFeedback({type:'error',message:'Your role can view stock; staging requires a planner or site lead.'}); return }
+    const res = reserveParts(siteId, currentPartId, asset.id, requiredQty, actor)
     if (res.success) {
       setFeedback({
         type: 'success',
@@ -86,7 +91,8 @@ function PartsAvailabilityContent({
 
   // Handle Release Reservation
   const handleRelease = () => {
-    const res = releaseReservation(siteId, currentPartId, asset.id)
+    if (!canStage) return
+    const res = releaseReservation(siteId, currentPartId, asset.id, null, actor)
     if (res.success) {
       setFeedback({
         type: 'info',
@@ -100,7 +106,9 @@ function PartsAvailabilityContent({
 
   // Handle Submit Reorder / Transfer Request
   const handleSubmitRequest = (isTransfer = false, sourceSite = null) => {
-    const qty = parseInt(reorderQty, 10) || 1
+    if (!canStage) { setFeedback({type:'error',message:'Your role cannot stage parts.'}); return }
+    const qty = Number(reorderQty)
+    if (!Number.isInteger(qty) || qty < 1) { setFeedback({type:'error',message:'Enter a positive whole quantity.'}); return }
     const defaultReason = isTransfer
       ? `Inter-site transfer from ${sourceSite?.siteName} to ${siteName} for ${asset.id} (${asset.type}). Historical parts wait: ${asset.partsHours || 0} hrs.`
       : `Reorder replenishment for ${asset.id} (${asset.type}) at ${siteName}. Historical parts wait: ${asset.partsHours || 0} hrs.`
@@ -121,7 +129,11 @@ function PartsAvailabilityContent({
       historicalWaitHours: asset.partsHours || 0,
     }
 
-    const created = createPartsRequest(reqData, userName)
+    let created
+    try {
+      created = isTransfer ? createTransfer(actor,{...reqData,fromSiteId:reqData.sourceSiteId,toSiteId:siteId,qty}) : createRushReorder(actor,{...reqData,qty,source:'equipment'})
+    } catch (error) { setFeedback({type:'error',message:error.message}); return }
+    notifyPartsChanged()
     setFeedback({
       type: 'success',
       message: `${isTransfer ? 'Transfer request' : 'Reorder request'} ${created.id} submitted for planner review.`,
@@ -132,6 +144,7 @@ function PartsAvailabilityContent({
   }
 
   const openReorderForm = (isTransfer = false, srcSite = null) => {
+    if (!canStage) { setFeedback({type:'error',message:'Your role can view sample stock; a planner or site lead stages requests.'}); return }
     setTransferSourceSite(srcSite)
     setReorderPriority(asset.status === 'warning' ? 'Urgent' : 'Standard')
     setReorderQty(Math.max(1, requiredQty - available))
@@ -162,6 +175,7 @@ function PartsAvailabilityContent({
       </div>
 
       <div className="modal-body parts-modal-body">
+        {!canStage && <PermissionNote />}
         {/* Feedback Notice */}
         {feedback && (
           <div
@@ -213,17 +227,6 @@ function PartsAvailabilityContent({
             <div>
               <span className="context-label">Downtime Events</span>
               <span className="context-value">{asset.events || 0} events</span>
-            </div>
-          </div>
-
-          {/* HSE Safety Notice distinguishing field authorization */}
-          <div className="maint-hse-banner hse-normal">
-            <ShieldAlert size={15} className="text-blue-700 flex-shrink-0" />
-            <div>
-              <strong>Parts Readiness vs Field Authorization:</strong>
-              <span>
-                Parts availability confirms warehouse staging only. Under case rules, critical open HSE actions ({site?.criticalActions || 0}) block field pilot execution until supervisor-verified closure.
-              </span>
             </div>
           </div>
         </div>
@@ -301,6 +304,7 @@ function PartsAvailabilityContent({
             <button
               type="button"
               className="btn-secondary text-xs"
+              disabled={!canStage}
               onClick={handleRelease}
               title="Release reserved part back to available warehouse pool"
             >
@@ -331,7 +335,7 @@ function PartsAvailabilityContent({
                 type="button"
                 className="btn-primary"
                 onClick={handleReserve}
-                disabled={isCurrentlyReservedForAsset && activeReservation?.qty >= requiredQty}
+                disabled={!canStage || (isCurrentlyReservedForAsset && activeReservation?.qty >= requiredQty)}
               >
                 <Package size={13} />
                 <span>
@@ -342,7 +346,8 @@ function PartsAvailabilityContent({
               <button
                 type="button"
                 className="btn-warn"
-                onClick={() => openReorderForm(false)}
+                disabled={!canStage}
+              onClick={() => openReorderForm(false)}
               >
                 <ShoppingCart size={13} />
                 <span>Request Reorder (Shortage)</span>
@@ -372,7 +377,8 @@ function PartsAvailabilityContent({
                   <button
                     type="button"
                     className="btn-secondary btn-sm"
-                    onClick={() => openReorderForm(true, as)}
+                    disabled={!canStage}
+              onClick={() => openReorderForm(true, as)}
                   >
                     <ArrowRightLeft size={11} />
                     <span>Request Transfer</span>
@@ -452,7 +458,8 @@ function PartsAvailabilityContent({
               <button
                 type="button"
                 className="btn-primary"
-                onClick={() => handleSubmitRequest(Boolean(transferSourceSite), transferSourceSite)}
+                disabled={!canStage}
+              onClick={() => handleSubmitRequest(Boolean(transferSourceSite), transferSourceSite)}
               >
                 {transferSourceSite ? 'Submit Transfer Request' : 'Submit Reorder Request'}
               </button>

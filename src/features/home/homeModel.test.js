@@ -49,3 +49,10 @@ test('scoped data removes records and quality summaries for other sites', () => 
   assert.deepEqual(Object.keys(scoped.dataQuality.bySite), ['S04'])
   assert.deepEqual(scoped.earlyWarning.alerts.map((alert) => alert.id), ['W1'])
 })
+
+test('scope keeps flat equipment readings even without nested site assets',()=>{
+ const flat={...data,sites:data.sites.map(({id,name})=>({id,name}))}
+ const scoped=filterDataToUserScope(flat,{siteIds:['S04']})
+ assert.deepEqual(scoped.equipment.map(a=>a.id),['A010'])
+ assert.deepEqual(Object.keys(scoped.readings),['A010'])
+})

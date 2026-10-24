@@ -1,5 +1,6 @@
 import { ArrowRight, MapPin, ShieldCheck } from 'lucide-react'
 import { filterDataToUserScope, getRoleHomeModel, getWidgetComponent } from './homeModel.js'
+import { ScopedDataProvider } from '../../app/DataContext.jsx'
 import './home.css'
 
 function WidgetFallback({ label }) {
@@ -25,7 +26,7 @@ export default function Home({ data, user, widgetComponents = {}, onNavigate }) 
   }
 
   return (
-    <div className="home-page">
+    <ScopedDataProvider data={scopedData}><div className="home-page">
       <header className="home-header">
         <div><div className="home-eyebrow">{model.eyebrow}</div><h1>{model.title}</h1><p>{model.description}</p></div>
         <button className="home-primary-action" type="button" onClick={() => navigate(model.action.href)}>
@@ -48,6 +49,6 @@ export default function Home({ data, user, widgetComponents = {}, onNavigate }) 
         <ShieldCheck size={18} aria-hidden="true" />
         <div><strong>Safety stays human-approved</strong><p>Parts readiness never replaces LOTO and isolation steps.</p></div>
       </aside>
-    </div>
+    </div></ScopedDataProvider>
   )
 }

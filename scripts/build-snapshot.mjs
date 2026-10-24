@@ -1,19 +1,8 @@
-import { readFile, writeFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { parseCaseQuestWorkbook } from '../src/utils/excelParser.js'
-
-const inputPath = resolve('CaseQuest2026Dataset.xlsx')
-const outputPath = resolve('src/data/operations.json')
-const maxBytes = 1.5 * 1024 * 1024
-
-const workbook = await readFile(inputPath)
-const data = parseCaseQuestWorkbook(workbook)
-const json = `${JSON.stringify(data)}\n`
+const data = parseCaseQuestWorkbook(readFileSync(new URL('../CaseQuest2026Dataset.xlsx', import.meta.url)))
+const json = JSON.stringify(data)
 const bytes = Buffer.byteLength(json)
-
-if (bytes > maxBytes) {
-  throw new Error(`Snapshot is ${bytes} bytes, above the ${maxBytes} byte limit`)
-}
-
-await writeFile(outputPath, json)
-console.log(`Wrote ${outputPath} (${bytes} bytes)`)
+if (bytes > 1500000) throw new Error(`Snapshot exceeds 1.5 MB: ${bytes} bytes`)
+writeFileSync(new URL('../src/data/operations.json', import.meta.url), json + '\n')
+console.log(`Snapshot: ${bytes + 1} bytes; ${data.events.length} events; ${Object.values(data.readings).reduce((n, rows) => n + rows.length, 0)} readings`)

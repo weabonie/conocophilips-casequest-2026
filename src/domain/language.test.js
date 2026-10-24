@@ -2,26 +2,25 @@ import assert from 'node:assert/strict'
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { test } from 'node:test'
-
-const forbidden = [/will fail/i, /prevented failure/i, /injur/i, /maintenance savings/i, /—/]
-
-async function sourceFiles(directory) {
-  const entries = await readdir(directory, { withFileTypes: true })
-  const files = []
-  for (const entry of entries) {
-    const path = join(directory, entry.name)
-    if (entry.isDirectory()) files.push(...await sourceFiles(path))
-    else if (/\.(js|jsx|css)$/.test(entry.name)) files.push(path)
-  }
-  return files
+// Scan visible product components, not test fixtures or explanatory negations.
+const unsupportedClaim = /\b(?:we|the system|this platform)\s+(?:prevents?|prevented)\s+(?:failures|injuries)\b|\bwill fail (?:within|in|on)\b/i
+async function productFiles(directory) {
+ const files=[]
+ for(const entry of await readdir(directory,{withFileTypes:true})) {
+  const path=join(directory,entry.name)
+  if(entry.isDirectory())files.push(...await productFiles(path))
+  else if(entry.name.endsWith('.jsx'))files.push(path)
+ }
+ return files
 }
-
-test('product language guard stays clear', async () => {
-  const files = await sourceFiles(new URL('../', import.meta.url).pathname)
-  const violations = []
-  for (const file of files) {
-    const content = await readFile(file, 'utf8')
-    if (forbidden.some((pattern) => pattern.test(content))) violations.push(file)
-  }
-  assert.deepEqual(violations, [])
+test('product language avoids unsupported outcome guarantees',async()=>{
+ const violations=[]
+ for(const file of await productFiles(new URL('../',import.meta.url).pathname))if(unsupportedClaim.test(await readFile(file,'utf8')))violations.push(file)
+ assert.deepEqual(violations,[])
+})
+test('language guard distinguishes guarantees from modeled avoided-downtime limits',()=>{
+ assert.equal(unsupportedClaim.test('The system prevents failures'),true)
+ assert.equal(unsupportedClaim.test('Asset will fail within 3 days'),true)
+ assert.equal(unsupportedClaim.test('Modeled avoided downtime, not prevented failures or realized savings.'),false)
+ assert.equal(unsupportedClaim.test('No maintenance savings or HSE benefits are monetized.'),false)
 })

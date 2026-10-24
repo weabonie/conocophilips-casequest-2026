@@ -1,1 +1,34 @@
-/* Activity styles are owned by the feature task. */
+.activity-page { max-width: 1440px; margin: 0 auto; min-width: 0; }
+.activity-muted, .activity-row-count { color: #647084; font-size: 12px; line-height: 1.6; }
+.activity-header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.activity-page button, .activity-note-actions button { border: 1px solid #d6dce5; border-radius: 5px; background: white; color: #334155; padding: 8px 11px; cursor: pointer; font: inherit; font-size: 12px; }
+.activity-page button:hover, .activity-note-actions button:hover { border-color: #2563eb; }
+.activity-page button:focus-visible, .activity-bell:focus-visible { outline: 3px solid #93b5ef; outline-offset: 2px; }
+.activity-filters { display: grid; grid-template-columns: 1.4fr repeat(5, 1fr); gap: 12px; padding: 16px; margin-top: 16px; align-items: end; }
+.activity-filters label { display: flex; flex-direction: column; gap: 6px; min-width: 0; color: #475569; font-size: 12px; }
+.activity-filters input, .activity-filters select { width: 100%; min-width: 0; border: 1px solid #d6dce5; border-radius: 4px; padding: 8px; background: white; color: #334155; font: inherit; }
+.activity-filters > button { justify-self: start; }
+.activity-timeline { list-style: none; padding: 0; display: grid; gap: 12px; }
+.activity-timeline > li { padding: 16px 20px; overflow-wrap: anywhere; font-size: 13px; }
+.activity-event-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.activity-event-heading > strong { color: #2459a9; font-weight: 600; }
+.activity-event-heading time, .activity-timeline small { font-size: 11px; color: #647084; }
+.activity-timeline p { line-height: 1.6; margin: 10px 0; }
+.activity-timeline details { margin-top: 12px; }
+.activity-timeline summary { color: #475569; cursor: pointer; font-size: 12px; }
+.activity-metadata { padding: 10px; background: #f8fafc; margin: 8px 0; }
+.activity-metadata > div { display: grid; grid-template-columns: minmax(100px, 1fr) 2fr; gap: 16px; margin: 8px 0; }
+.activity-metadata dt { font-weight: 600; }.activity-metadata dd { margin: 0; }
+.activity-id { display: block; margin-top: 12px; }
+.activity-bell { position: relative; display: inline-flex; align-items: center; gap: 5px; background: #fff; border: 1px solid #d6dce5; border-radius: 5px; padding: 7px; cursor: pointer; color: #475569; flex-shrink: 0; }
+.activity-bell > span { background: #b45309; color: white; border-radius: 10px; min-width: 17px; padding: 1px 4px; font-size: 10px; text-align: center; }
+.activity-notifications { list-style: none; padding: 0; max-height: 60vh; overflow-y: auto; }
+.activity-notifications > li { padding: 14px 10px; border-bottom: 1px solid #e5e9ef; border-left: 3px solid #2563eb; margin-bottom: 8px; font-size: 13px; overflow-wrap: anywhere; }
+.activity-notifications > li.is-read { border-left-color: #d6dce5; }
+.activity-notifications p { line-height: 1.6; margin: 7px 0; color: #586476; }.activity-notifications small { color: #647084; font-size: 11px; }
+.activity-note-actions { display: flex; align-items: center; gap: 14px; margin-top: 10px; font-size: 12px; }
+.activity-note-actions a, .activity-mini a { color: #2459a9; }.activity-note-actions > span { color: #647084; }
+.activity-preview-label { display: block; padding: 6px 8px; background: #fff7e8; color: #8b5a13 !important; border-radius: 4px; margin-top: 8px; font-size: 12px; }
+.activity-mini { padding: 18px; }.activity-mini-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.activity-mini h2 { font-size: 15px; }.activity-mini ol { list-style: none; padding: 0; }.activity-mini li { border-top: 1px solid #e5e9ef; padding: 12px 0; font-size: 12px; }.activity-mini p, .activity-mini time { color: #647084; font-size: 11px; margin: 5px 0; }
+@media (max-width: 1150px) { .activity-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .activity-filters { grid-template-columns: minmax(0, 1fr); }.activity-event-heading { flex-direction: column; gap: 6px; }.activity-timeline > li { padding: 14px; }.activity-metadata > div { grid-template-columns: minmax(0, 1fr); gap: 3px; }.activity-page .page-heading { flex-direction: column; align-items: flex-start; } }

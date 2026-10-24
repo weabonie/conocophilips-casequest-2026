@@ -140,7 +140,7 @@ export default function MaintenanceQueueTable({
       {/* Panel Header */}
       <div className="panel-heading">
         <div>
-          <div className="eyebrow">OPERATIONAL WORKFLOW</div>
+          <div className="eyebrow">Operational Workflow</div>
           <h2>Saved Maintenance Queue</h2>
           <p>
             Persisted locally · Linked to warehouse parts reservations and team assignments
@@ -148,7 +148,7 @@ export default function MaintenanceQueueTable({
         </div>
         <div className="queue-header-actions">
           <span className="tag">
-            {requests.length} {requests.length === 1 ? 'WORK ORDER' : 'WORK ORDERS'}
+            {requests.length} {requests.length === 1 ? 'Work Order' : 'Work Orders'}
           </span>
         </div>
       </div>
@@ -468,11 +468,10 @@ export default function MaintenanceQueueTable({
         </div>
       )}
 
-      {/* Queue Disclaimer & Realism Separator */}
+      {/* Queue Footer */}
       <div className="queue-footer-note">
         <span>
-          <strong>Prototype Planning Storage:</strong> Work orders persist locally in browser storage (key: <code>cq_prototype_maintenance_requests_v1</code>).
-          Entries do not modify 2025 historical Excel records. Field execution requires qualified supervisor work permits and HSE verification.
+          Work orders persist in local browser storage (key: <code>cq_prototype_maintenance_requests_v1</code>).
         </span>
       </div>
     </section>

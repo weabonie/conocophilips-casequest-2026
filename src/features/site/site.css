@@ -1,1 +1,14 @@
-/* Site styles are owned by the integration task. */
+.site-page > a { color: #b45309; font-size: 13px; }
+.site-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.site-context { padding: 20px; }
+.site-context h2 { margin: 0 0 16px; font-size: 16px; }
+.site-context p { color: #64748b; font-size: 13px; line-height: 1.65; }
+.site-context dl { margin: 0 0 16px; }
+.site-context dl div { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid #edf0f3; font-size: 13px; }
+.site-context dd { margin: 0; font-weight: 600; }
+.site-context a, .site-feature-links a { color: #b45309; }
+.site-feature-links { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+.site-feature-links a { background: white; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; }
+.site-events { margin-top: 20px; }
+.site-events table { white-space: nowrap; }
+@media(max-width: 700px) { .site-detail-grid { grid-template-columns: 1fr; } .site-context { padding: 16px; } }

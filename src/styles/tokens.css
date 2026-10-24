@@ -1,40 +1,17 @@
-:root {
-  --cq-color-ink: #111827;
-  --cq-color-muted: #6b7280;
-  --cq-color-subtle: #9ca3af;
-  --cq-color-border: #e5e7eb;
-  --cq-color-border-strong: #d1d5db;
-  --cq-color-surface: #ffffff;
-  --cq-color-canvas: #f9fafb;
-  --cq-color-primary: #2563eb;
-  --cq-color-primary-soft: #eff6ff;
-  --cq-color-primary-border: #bfdbfe;
-  --cq-color-success: #047857;
-  --cq-color-success-soft: #ecfdf5;
-  --cq-color-warning: #b45309;
-  --cq-color-warning-soft: #fffbeb;
-  --cq-color-danger: #b91c1c;
-  --cq-color-danger-soft: #fef2f2;
-  --cq-radius-sm: 4px;
-  --cq-radius-md: 7px;
-  --cq-radius-lg: 8px;
-  --cq-shadow-panel: 0 2px 3px rgba(17, 24, 39, 0.02);
-  --cq-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.22);
-  --cq-space-1: 4px;
-  --cq-space-2: 8px;
-  --cq-space-3: 12px;
-  --cq-space-4: 16px;
-  --cq-space-5: 20px;
-  --cq-space-6: 24px;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[tabindex]:focus-visible {
-  outline: 3px solid var(--cq-color-primary);
-  outline-offset: 3px;
-  box-shadow: var(--cq-focus-ring);
-}
+:root { --cq-blue:#2563eb; --cq-border:#e5e7eb; --cq-muted:#64748b; --cq-surface:#fff; --cq-radius:8px; }
+:focus-visible { outline:2px solid var(--cq-blue); outline-offset:3px; }
+.cq-status,.cq-banner { border-radius:6px; padding:5px 9px; font-size:12px; }
+.cq-status { display:inline-block; background:#f1f5f9; text-transform:capitalize; }
+.cq-status-locked,.cq-banner-danger { background:#fef2f2; color:#991b1b; }
+.cq-status-warning,.cq-banner-warn { background:#fffbeb; color:#92400e; }
+.cq-status-ready,.cq-status-ok,.cq-status-live,.cq-banner-success { background:#ecfdf5; color:#166534; }
+.cq-banner-info { background:#eff6ff; color:#1e40af; }.cq-banner { margin:12px 0; }
+.cq-empty { padding:28px; }.cq-permission,.cq-unknown { color:var(--cq-muted); }.cq-source { border:0; border-bottom:1px dotted var(--cq-blue); background:transparent; color:inherit; font:inherit; cursor:pointer; }
+.cq-dialog { width:min(720px,calc(100vw - 32px)); max-height:85vh; border:1px solid var(--cq-border); border-radius:10px; padding:24px; }.cq-dialog::backdrop { background:#0f172a66; }.cq-dialog-heading { display:flex; justify-content:space-between; gap:20px; align-items:center; }.cq-dialog label { display:block; margin:16px 0; }.cq-dialog input,.cq-dialog textarea { display:block; width:100%; padding:9px; border:1px solid var(--cq-border); border-radius:5px; margin-top:6px; }.cq-dialog button { cursor:pointer; padding:7px 12px; }.cq-role-select { max-width:160px; border:1px solid var(--cq-border); border-radius:5px; padding:6px; background:white; font-size:12px; }.cq-demo-reset { font-size:11px; background:transparent; border:0; color:var(--cq-muted); cursor:pointer; }
+.sidebar { overflow-y:auto; }.sidebar-user { margin-top:auto; }.cq-nav-icon { flex-shrink:0; }
+@media(max-width:600px) { .cq-role-select { max-width:115px; }.topbar-username { display:none; }.cq-demo-reset { max-width:65px; }.cq-dialog { padding:16px; }.sidebar .nav-btn { min-height:38px; }.sidebar { overflow-y:auto; } }
+.cq-mobile-nav { display:none; }.sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+@media(min-width:601px) and (max-width:1000px) { .sidebar { width:190px; }.sidebar .nav-btn { justify-content:flex-start; margin-top:4px; }.sidebar .nav-btn span { display:inline; }.sidebar .sidebar-user-info { display:flex; }.sidebar .sidebar-signout-btn { display:block; } }
+@media(max-width:600px) { .cq-mobile-nav { display:block; min-width:0; max-width:130px; padding:5px; border:1px solid var(--cq-border); border-radius:5px; background:white; font-size:11px; }.topbar { height:auto; min-height:66px; padding:8px 12px; flex-wrap:wrap; gap:6px; }.topbar-left { width:100%; }.topbar-right { flex:1; flex-wrap:wrap; gap:6px; justify-content:flex-start; } }
+.cq-brand-icon { display:flex; color:#2563eb; flex-shrink:0; }.brand .cq-brand-name { font-size:13px; line-height:1.3; color:#111827; }.brand .cq-brand-name small { color:#64748b; margin:2px 0 0; font-size:11px; }.topbar-right { min-width:0; }
+@media(min-width:601px) and (max-width:1000px) { .brand .cq-brand-name { display:block; } }

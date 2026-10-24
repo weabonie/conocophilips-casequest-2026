@@ -1,89 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { X } from 'lucide-react'
-import './ui.css'
-
-export function PageHeader({ eyebrow, title, description, actions }) {
-  return (
-    <div className="ui-page-header">
-      <div>
-        {eyebrow && <div className="ui-eyebrow">{eyebrow}</div>}
-        <h1>{title}</h1>
-        {description && <p>{description}</p>}
-      </div>
-      {actions && <div className="ui-page-header-actions">{actions}</div>}
-    </div>
-  )
-}
-
-export function KpiTile({ label, value, detail, icon: Icon }) {
-  return <article className="ui-kpi-tile"><div className="ui-kpi-label">{label}{Icon && <Icon size={16} />}</div><div className="ui-kpi-value">{value}</div>{detail && <div className="ui-kpi-detail">{detail}</div>}</article>
-}
-
-export function StatusBadge({ status = 'unknown', children }) {
-  return <span className={`ui-status-badge ui-status-${status}`}>{children || status}</span>
-}
-
-export function Banner({ tone = 'info', title, children }) {
-  return <div className={`ui-banner ui-banner-${tone}`} role={tone === 'danger' ? 'alert' : 'status'}><div>{title && <strong>{title}</strong>}{children && <span>{children}</span>}</div></div>
-}
-
-export function ConfidenceBadge({ siteId, missingPct, latePct, label }) {
-  const text = label || `${siteId}: ${missingPct ?? 'unknown'}% missing, ${latePct ?? 'unknown'}% late`
-  const tone = Number(missingPct) > 10 || Number(latePct) > 10 ? 'warning' : 'ok'
-  return <StatusBadge status={tone}>{text}</StatusBadge>
-}
-
-export function SourceDrawer({ open, onClose, title = 'Source records', children }) {
-  const closeButton = useRef(null)
-  useEffect(() => {
-    if (!open) return undefined
-    closeButton.current?.focus()
-    const onKeyDown = (event) => event.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [open, onClose])
-  if (!open) return null
-  return <div className="ui-drawer-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><aside className="ui-source-drawer" role="dialog" aria-modal="true" aria-label={title}><div className="ui-drawer-header"><strong>{title}</strong><button ref={closeButton} type="button" onClick={onClose} aria-label="Close source records"><X size={16} /></button></div><div className="ui-drawer-body">{children}</div></aside></div>
-}
-
-export function Sourced({ source, resolve, children }) {
-  const [open, setOpen] = useState(false)
-  const records = resolve ? resolve(source) : source
-  return <><button type="button" className="ui-sourced" onClick={() => setOpen(true)} aria-label="Open source records">{children}</button><SourceDrawer open={open} onClose={() => setOpen(false)}><pre>{JSON.stringify(records, null, 2)}</pre></SourceDrawer></>
-}
-
-export function ReasonDialog({ open, title = 'Reason required', onCancel, onConfirm }) {
-  if (!open) return null
-  return <ReasonDialogContent key={title} title={title} onCancel={onCancel} onConfirm={onConfirm} />
-}
-
-export function ConfirmByNameDialog({ open, name, title = 'Confirm action', onCancel, onConfirm }) {
-  if (!open) return null
-  return <ConfirmByNameDialogContent key={`${name}-${title}`} name={name} title={title} onCancel={onCancel} onConfirm={onConfirm} />
-}
-
-function ReasonDialogContent({ title, onCancel, onConfirm }) {
-  const [reason, setReason] = useState('')
-  return <div className="ui-dialog-backdrop"><div className="ui-dialog" role="dialog" aria-modal="true" aria-labelledby="reason-dialog-title"><h2 id="reason-dialog-title">{title}</h2><p>Give a short reason to keep this decision in the activity log.</p><textarea autoFocus value={reason} onChange={(event) => setReason(event.target.value)} rows={4} placeholder="Enter a reason" /><div className="ui-dialog-actions"><button type="button" className="ui-button ui-button-secondary" onClick={onCancel}>Cancel</button><button type="button" className="ui-button ui-button-primary" disabled={!reason.trim()} onClick={() => onConfirm(reason.trim())}>Confirm</button></div></div></div>
-}
-
-function ConfirmByNameDialogContent({ name, title, onCancel, onConfirm }) {
-  const [typedName, setTypedName] = useState('')
-  return <div className="ui-dialog-backdrop"><div className="ui-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-name-title"><h2 id="confirm-name-title">{title}</h2><p>Type <strong>{name}</strong> to confirm.</p><input autoFocus value={typedName} onChange={(event) => setTypedName(event.target.value)} aria-label="Type your name" /><div className="ui-dialog-actions"><button type="button" className="ui-button ui-button-secondary" onClick={onCancel}>Cancel</button><button type="button" className="ui-button ui-button-primary" disabled={typedName.trim() !== name} onClick={onConfirm}>Confirm</button></div></div></div>
-}
-
-export function EmptyState({ title, guideSection, description = 'This screen is ready for its feature owner.' }) {
-  return <section className="ui-empty-state"><div className="ui-eyebrow">{guideSection}</div><h1>{title}</h1><p>{description}</p></section>
-}
-
-export function PermissionNote({ children = 'You do not have permission to take this action.' }) {
-  return <p className="ui-permission-note" role="note">{children}</p>
-}
-
-export function SampleDataTag() {
-  return <span className="ui-sample-tag">Sample data</span>
-}
-
-export function Unknown() {
-  return <span>unknown</span>
-}
+import { useId, useRef, useEffect, useState } from 'react'
+export function PageHeader({ title, subtitle, children }) { return <div className="page-heading"><div><h1>{title}</h1>{subtitle && <p>{subtitle}</p>}</div>{children}</div> }
+export function KpiTile({ label, value, unit, detail }) { return <article className="metric"><div className="metric-label">{label}</div><div className="metric-value">{value ?? <Unknown />}<span>{unit}</span></div><div className="metric-detail">{detail}</div></article> }
+export function StatusBadge({ status = 'unknown', children }) { return <span className={`cq-status cq-status-${status}`}>{children || status}</span> }
+export function Banner({ variant = 'info', children }) { return <div className={`cq-banner cq-banner-${variant}`} role="status">{children}</div> }
+export function ConfidenceBadge({ siteId, missingPct, latePct, label }) { return <span className="tag" title={`${siteId || ''}: missing ${missingPct ?? 'unknown'}%; delayed ${latePct ?? 'unknown'}%`}>{label || (missingPct == null ? 'Confidence unknown' : `${missingPct.toFixed(1)}% missing`)}</span> }
+export function EmptyState({ title, children, description }) { return <section className="panel cq-empty"><h2>{title}</h2><p>{description || children || 'This workspace is being prepared.'}</p></section> }
+export function PermissionNote({ children }) { return <small className="cq-permission">{children || 'Your demo role can view this information but cannot perform this action.'}</small> }
+export function SampleDataTag() { return <span className="tag">Sample stock levels</span> }
+export function Unknown() { return <span className="cq-unknown">unknown</span> }
+export function Dialog({ open, title, onClose, children }) { const ref = useRef(null); const id = useId(); useEffect(() => { const el = ref.current; if (open && !el.open) el.showModal(); else if (!open && el.open) el.close() }, [open]); return <dialog className="cq-dialog" ref={ref} aria-labelledby={id} onCancel={onClose} onClick={event => { if (event.target === ref.current) onClose() }}><div className="cq-dialog-heading"><h2 id={id}>{title}</h2><button onClick={onClose} aria-label="Close dialog">×</button></div>{open && children}</dialog> }
+export function ReasonDialog({ open, isOpen, title = 'Record a reason', onConfirm, onClose }) { const [reason, setReason] = useState(''); return <Dialog open={open ?? isOpen} title={title} onClose={onClose}><form onSubmit={e => { e.preventDefault(); if (reason.trim()) { onConfirm(reason.trim()); setReason('') } }}><label>Reason<textarea required value={reason} onChange={e => setReason(e.target.value)} /></label><button type="submit" disabled={!reason.trim()}>Confirm</button></form></Dialog> }
+export function ConfirmByNameDialog({ open, isOpen, title = 'Confirm decision', name, expectedName, onConfirm, onClose }) { const [typed, setTyped] = useState(''); const target = expectedName || name; return <Dialog open={open ?? isOpen} title={title} onClose={onClose}><form onSubmit={e => { e.preventDefault(); if (target && typed.trim().toLowerCase() === target.toLowerCase()) { onConfirm(typed.trim()); setTyped('') } }}><label>Type your name: {target}<input required value={typed} onChange={e => setTyped(e.target.value)} /></label><button disabled={!target || typed.trim().toLowerCase() !== target.toLowerCase()}>Confirm</button></form></Dialog> }
+export function SourceDrawer({ open, isOpen, source, onClose }) { return <Dialog open={open ?? isOpen} title={source?.label || 'Source records'} onClose={onClose}><div className="table-scroll">{source?.rows?.length ? <table><thead><tr>{source.columns.map(c => <th key={c.key}>{c.label}</th>)}</tr></thead><tbody>{source.rows.map((row, i) => <tr key={row.id || i}>{source.columns.map(c => <td key={c.key}>{row[c.key] == null ? 'unknown' : typeof row[c.key] === 'object' ? JSON.stringify(row[c.key]) : String(row[c.key])}</td>)}</tr>)}</tbody></table> : <p>No source records available.</p>}</div></Dialog> }
+export function Sourced({ source, resolve, children }) { const [open, setOpen] = useState(false); const resolved = resolve ? resolve(source) : source; return <><button className="cq-source" title="View source records" onClick={() => setOpen(true)}>{children}</button><SourceDrawer open={open} source={resolved} onClose={() => setOpen(false)} /></> }

@@ -1,28 +1,12 @@
 import { useSyncExternalStore } from 'react'
-
-const DEFAULT_AS_OF = '2026-10-01'
+import data from '../data/operations.json' with { type: 'json' }
 let replayDate = null
 const listeners = new Set()
-
-const notify = () => listeners.forEach(listener => listener())
-const subscribe = listener => {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
-}
-const normalize = value => value == null ? null : String(value).slice(0, 10)
-
-export function getAsOf(data) {
-  return replayDate || normalize(data?.hseAsOf) || DEFAULT_AS_OF
-}
-
+export function getAsOf() { return replayDate || data.hseAsOf || '2026-10-01' }
 export function setReplayDate(date) {
-  replayDate = normalize(date)
-  notify()
+  if (date != null && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || new Date(`${date}T00:00Z`).toISOString().slice(0, 10) !== date)) throw new Error('Invalid replay date')
+  replayDate = date
+  listeners.forEach(listener => listener())
 }
-
-export function useAsOf(data) {
-  return useSyncExternalStore(subscribe, () => getAsOf(data), () => getAsOf(data))
-}
-
-export { subscribe }
-
+const subscribe = listener => { listeners.add(listener); return () => listeners.delete(listener) }
+export function useAsOf() { return useSyncExternalStore(subscribe, getAsOf, getAsOf) }

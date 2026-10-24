@@ -34,3 +34,4 @@
   .home-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .home-widget, .home-widget-dispatch, .home-widget-hse, .home-widget-earlyWarning, .home-widget-reorders, .home-widget-overview, .home-widget-siteStatus, .home-widget-simulator { grid-column: span 1; }
 }
+.home-widget > .panel {border:0;box-shadow:none;padding:22px;margin:0}.home-widget > a {display:inline-flex;margin:22px}.home-widget-overview,.home-widget-siteStatus {grid-column:span 12;padding:18px}.home-widget-overview .overview-kpis {margin:0}.home-widget .overview-section-heading {display:block}.home-widget .overview-sites {grid-template-columns:repeat(3,minmax(0,1fr))}.home-widget .overview-rollout {flex-wrap:wrap}@media(max-width:1000px){.home-widget .overview-sites{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.home-widget .overview-sites{grid-template-columns:1fr}.home-widget-overview,.home-widget-siteStatus{grid-column:span 1;padding:12px}}

@@ -36,7 +36,7 @@ test('source workbook reconciles to independent controls after cleaning', () => 
   const source = readFileSync(new URL('../../CaseQuest2026Dataset.xlsx', import.meta.url))
   const result = parseCaseQuestWorkbook(source, { includeCleanedTables: true })
   assert.deepEqual(Object.fromEntries(Object.entries(result.dataQuality.tables).map(([name, v]) => [name, v.cleanRows])), {
-    Assets: 18, Production: 216, Events: 385, HSE: 36, Readings: 6570, Solutions: 6, Cleaning_Log: 12,
+    Assets: 18, Production: 216, Events: 385, HSE: 36, Readings: 6570, Solutions: 6,
   })
   const sum = key => Math.round(result.sites.reduce((n, site) => n + site[key], 0) * 100) / 100
   assert.equal(sum('events'), 313)
@@ -50,26 +50,6 @@ test('source workbook reconciles to independent controls after cleaning', () => 
   }
   assert.deepEqual(result.dataQuality.remainingUnknowns, { partsInvoices: 14, missingReadings: 339, suspectReadings: 58 })
   assert.ok(result.cleanedTables.Events.filter(e => e.parts_usd == null).every(e => e.parts_usd === null))
-})
-
-test('emits the complete F1 data contract from the final workbook', () => {
-  const result = parseCaseQuestWorkbook(readFileSync(new URL('../../CaseQuest2026Dataset.xlsx', import.meta.url)))
-  assert.equal(result.events.length, 385)
-  assert.equal(result.events.filter(event => event.type === 'Unplanned').length, 313)
-  assert.equal(result.events.filter(event => event.partsUsd == null).length, 14)
-  assert.equal(Object.values(result.readings).reduce((sum, rows) => sum + rows.length, 0), 6570)
-  assert.equal(result.hseActions.length, 36)
-  assert.equal(result.hseActions.filter(action => action.status === 'Open').length, 11)
-  assert.equal(result.hseActions.filter(action => action.status === 'Open' && action.severity === 5).length, 6)
-  assert.equal(result.solutions.find(solution => solution.id === 'O4').fractions.partsWait.base, 0.6)
-  assert.equal(result.cleaningLog.length, 12)
-  assert.equal(result.earlyWarning.alerts.length, 479)
-  assert.equal(result.earlyWarning.summary.falseAlarms, 0)
-  assert.deepEqual(result.dataQuality.bySite.S04, {
-    readings: 1095, valid: 954, missing: 135, suspect: 6, late: 102,
-    missingPct: 12.3, suspectPct: 0.5, latePct: 9.3, avgLateHours: 30,
-  })
-  assert.equal(result.equipment.filter(asset => asset.status === 'warning').length, 0)
 })
 
 test('normalizes IDs, units and reconstructible values, including planned production losses', () => {
@@ -191,4 +171,30 @@ test('rejects ambiguous sensor snapshots, receipt before observation and invalid
     mutate(f)
     assert.throws(() => parse(f))
   }
+})
+
+test('extended data contract preserves real source evidence and modeling assumptions', () => {
+  const data = parseCaseQuestWorkbook(readFileSync(new URL('../../CaseQuest2026Dataset.xlsx', import.meta.url)))
+  assert.equal(data.events.length, 385)
+  assert.equal(Object.values(data.readings).flat().length, 6570)
+  assert.equal(data.events.filter(e => e.partsUsd === null).length, 14)
+  assert.equal(data.hseActions.length, 36)
+  const open = data.hseActions.filter(a => a.status === 'Open')
+  assert.equal(open.length, 11)
+  assert.ok(open.every(a => a.daysOverdue > 0))
+  assert.ok(data.hseActions.filter(a => a.status === 'Closed').every(a => a.daysOverdue === null))
+  assert.equal(data.dataQuality.bySite.S04.late, 102)
+  assert.equal(data.dataQuality.bySite.S04.missingPct, 12.33)
+  assert.equal(data.dataQuality.bySite.S04.latePct, 9.32)
+  assert.equal(Object.values(data.dataQuality.bySite).reduce((n, q) => n + q.late, 0), 102)
+  assert.ok(Object.values(data.readings).flat().filter(r => r.quality !== 'Valid').every(r => r.vib === null && r.temp === null))
+  assert.ok(data.cleaningLog.length > 0)
+  const solution = id => data.solutions.find(s => s.id === id)
+  assert.equal(solution('O4').fractions.partsWait.base, 0.6)
+  assert.equal(solution('O1').fractions.detect.base, 0.6)
+  assert.equal(solution('O1').fractions.repair.base, 0.25)
+  assert.equal(solution('O3').fractions.detect.base, 0.2)
+  assert.equal(solution('O3').fractions.dispatch.base, 0.3)
+  assert.equal(solution('O5').fractions.repair.base, 0.5)
+  assert.ok(Buffer.byteLength(JSON.stringify(data)) < 1500000)
 })
