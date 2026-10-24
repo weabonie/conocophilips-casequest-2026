@@ -99,7 +99,7 @@ export default function App() {
             <LoneMesaMark size={20} />
           </span>
         </a>
-        <div className="workspace-label">WORKSPACE</div>
+        <div className="workspace-label">Workspace</div>
         <button
           className={`nav-btn ${activeTab === 'overview' ? 'nav-active' : ''}`}
           onClick={() => setActiveTab('overview')}
@@ -180,7 +180,7 @@ export default function App() {
           <div className="page-content">
             <div className="page-heading">
               <div>
-                <div className="eyebrow">PRODUCTION &amp; RELIABILITY</div>
+                <div className="eyebrow">Production &amp; Reliability</div>
                 <h1>Operations overview</h1>
                 <p>Production impact, downtime, and maintenance priorities.</p>
               </div>
@@ -231,7 +231,7 @@ export default function App() {
                     <h2>Explore your sites</h2>
                     <p>Select a site to filter every view below.</p>
                   </div>
-                  <span className="tag">6 SITES</span>
+                  <span className="tag">6 Sites</span>
                 </div>
                 <div className="site-map" role="group" aria-label="Interactive terrain and ocean site map">
                   <img
@@ -315,7 +315,7 @@ export default function App() {
               <section className="panel site-summary">
                 <div className="panel-heading">
                   <div>
-                    <div className="eyebrow">SELECTED SCOPE</div>
+                    <div className="eyebrow">Selected Scope</div>
                     <h2>{active ? active.name : 'All sites'}</h2>
                   </div>
                   <MapPin size={20} />
@@ -429,7 +429,7 @@ export default function App() {
                     Ranked by time waiting for parts · {active ? active.name : 'all sites'}
                   </p>
                 </div>
-                <span className="tag">{assets.length} ASSETS</span>
+                <span className="tag">{assets.length} Assets</span>
               </div>
               <div className="table-scroll">
                 <table>

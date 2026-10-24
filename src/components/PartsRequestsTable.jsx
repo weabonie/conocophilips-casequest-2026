@@ -105,7 +105,7 @@ export default function PartsRequestsTable({
       {/* Panel Header */}
       <div className="panel-heading">
         <div>
-          <div className="eyebrow">SUPPLY CHAIN &amp; REORDER WORKFLOW</div>
+          <div className="eyebrow">Supply Chain &amp; Reorder Workflow</div>
           <h2>Parts Requests &amp; Replenishment Queue</h2>
           <p>
             Review reorders and transfers · Approval authorizes receipt; recording receipt updates on-hand inventory
@@ -113,7 +113,7 @@ export default function PartsRequestsTable({
         </div>
         <div className="queue-header-actions">
           <span className="tag">
-            {requests.length} {requests.length === 1 ? 'PARTS REQUEST' : 'PARTS REQUESTS'}
+            {requests.length} {requests.length === 1 ? 'Parts Request' : 'Parts Requests'}
           </span>
         </div>
       </div>

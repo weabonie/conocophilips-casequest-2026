@@ -355,7 +355,7 @@ export default function EquipmentHealthView({
       {/* Header Banner */}
       <div className="page-heading">
         <div>
-          <div className="eyebrow">ASSET INTEGRITY, PARTS &amp; SCHEDULING</div>
+          <div className="eyebrow">Asset Integrity, Parts &amp; Scheduling</div>
           <h1>Equipment Health &amp; Maintenance Hub</h1>
           <p>
             Connected equipment health, warehouse parts availability, reorder requests, and maintenance scheduling.
