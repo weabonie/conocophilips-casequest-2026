@@ -44,8 +44,10 @@ test('source workbook reconciles to independent controls after cleaning', () => 
   assert.equal(sum('loss'), 5608389.61)
   assert.equal(sum('criticalActions'), 6)
   assert.equal(sum('openActions'), 11)
-  assert.equal(result.dataQuality.counts.fahrenheitConverted, 4)
-  assert.equal(result.dataQuality.counts.derivedValuesRecovered, 7)
+  // The FINAL workbook ships pre-cleaned (see its Cleaning_Log sheet), so the parser has no unit, ID or derived-value fixes left to apply.
+  for (const key of ['fahrenheitConverted', 'derivedValuesRecovered', 'unitsNormalized', 'idsNormalized']) {
+    assert.equal(result.dataQuality.counts[key] ?? 0, 0, key)
+  }
   assert.deepEqual(result.dataQuality.remainingUnknowns, { partsInvoices: 14, missingReadings: 339, suspectReadings: 58 })
   assert.ok(result.cleanedTables.Events.filter(e => e.parts_usd == null).every(e => e.parts_usd === null))
 })
