@@ -1,7 +1,8 @@
 {
-  "source": "CaseQuest2026Dataset.xlsx",
-  "period": "2025 full year",
+  "source": "CaseQuest2026Dataset.xlsx (parsed workbook)",
+  "period": "2025 historical data",
   "hseAsOf": "2026-10-01",
+  "lastSyncTime": "2026-10-24T19:18:36.666Z",
   "sites": [
     {
       "id": "S01",
@@ -17,7 +18,7 @@
       "loss": 615781.78,
       "stages": {
         "detect": 139.12,
-        "dispatch": 136.0,
+        "dispatch": 136,
         "parts_wait": 110.45,
         "repair": 361.55,
         "restart": 68.77
@@ -34,14 +35,14 @@
           "events": 12
         },
         {
-          "name": "Process upset",
-          "hours": 113.23,
-          "events": 8
-        },
-        {
           "name": "Seal leak",
           "hours": 192.36,
           "events": 13
+        },
+        {
+          "name": "Process upset",
+          "hours": 113.23,
+          "events": 8
         },
         {
           "name": "Unknown",
@@ -51,28 +52,82 @@
       ],
       "assets": [
         {
-          "id": "A001",
-          "type": "Transfer pump",
-          "events": 17,
-          "hours": 275.76,
-          "partsHours": 33.89,
-          "loss": 208881.79
-        },
-        {
           "id": "A002",
+          "siteId": "S01",
+          "siteName": "Cedar",
           "type": "Lift pump",
+          "criticality": "Medium",
+          "ageYears": 6,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.79,
+          "currentTemp": 63.7,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 83,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:39.041Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 17,
           "hours": 294.21,
-          "partsHours": 40.0,
+          "partsHours": 40,
           "loss": 165527.9
         },
         {
           "id": "A003",
+          "siteId": "S01",
+          "siteName": "Cedar",
           "type": "Compressor",
+          "criticality": "High",
+          "ageYears": 11,
+          "vibNormal": 3.4,
+          "tempNormal": 76,
+          "currentVib": 3.44,
+          "currentTemp": 78.2,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 36,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:54.131Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 14,
           "hours": 245.92,
           "partsHours": 36.56,
           "loss": 241372.09
+        },
+        {
+          "id": "A001",
+          "siteId": "S01",
+          "siteName": "Cedar",
+          "type": "Transfer pump",
+          "criticality": "High",
+          "ageYears": 9,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 3.15,
+          "currentTemp": 60.7,
+          "status": "warning",
+          "statusReason": "Latest valid snapshot exceeds the prototype vibration rule or contains an abnormal observation",
+          "abnormalCount": 77,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:40.174Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
+          "events": 17,
+          "hours": 275.76,
+          "partsHours": 33.89,
+          "loss": 208881.79
         }
       ]
     },
@@ -102,9 +157,9 @@
           "events": 23
         },
         {
-          "name": "Electrical trip",
-          "hours": 126.29,
-          "events": 6
+          "name": "Seal leak",
+          "hours": 308.79,
+          "events": 14
         },
         {
           "name": "Process upset",
@@ -112,9 +167,9 @@
           "events": 7
         },
         {
-          "name": "Seal leak",
-          "hours": 308.79,
-          "events": 14
+          "name": "Electrical trip",
+          "hours": 126.29,
+          "events": 6
         },
         {
           "name": "Unknown",
@@ -124,24 +179,78 @@
       ],
       "assets": [
         {
-          "id": "A004",
-          "type": "Transfer pump",
-          "events": 17,
-          "hours": 390.52,
-          "partsHours": 101.06,
-          "loss": 406480.41
-        },
-        {
           "id": "A005",
+          "siteId": "S02",
+          "siteName": "Mesa",
           "type": "Lift pump",
+          "criticality": "Medium",
+          "ageYears": 10,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.34,
+          "currentTemp": 65.5,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 85,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:53.147Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 20,
           "hours": 452.27,
           "partsHours": 130.56,
           "loss": 346912.99
         },
         {
+          "id": "A004",
+          "siteId": "S02",
+          "siteName": "Mesa",
+          "type": "Transfer pump",
+          "criticality": "High",
+          "ageYears": 13,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.92,
+          "currentTemp": 59.7,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 87,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:21.572Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
+          "events": 17,
+          "hours": 390.52,
+          "partsHours": 101.06,
+          "loss": 406480.41
+        },
+        {
           "id": "A006",
+          "siteId": "S02",
+          "siteName": "Mesa",
           "type": "Compressor",
+          "criticality": "High",
+          "ageYears": 7,
+          "vibNormal": 3.4,
+          "tempNormal": 76,
+          "currentVib": 2.86,
+          "currentTemp": 76.4,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 53,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:57.573Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 19,
           "hours": 403.61,
           "partsHours": 94.99,
@@ -175,14 +284,14 @@
           "events": 18
         },
         {
-          "name": "Electrical trip",
-          "hours": 97.5,
-          "events": 7
-        },
-        {
           "name": "Process upset",
           "hours": 122.44,
           "events": 6
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 97.5,
+          "events": 7
         },
         {
           "name": "Seal leak",
@@ -197,27 +306,81 @@
       ],
       "assets": [
         {
-          "id": "A007",
-          "type": "Transfer pump",
-          "events": 12,
-          "hours": 192.73,
-          "partsHours": 14.81,
-          "loss": 157412.0
-        },
-        {
           "id": "A008",
+          "siteId": "S03",
+          "siteName": "Juniper",
           "type": "Lift pump",
+          "criticality": "Medium",
+          "ageYears": 5,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.92,
+          "currentTemp": 58.1,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 73,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:55.476Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 15,
           "hours": 279.08,
           "partsHours": 73.62,
           "loss": 181194.22
         },
         {
+          "id": "A007",
+          "siteId": "S03",
+          "siteName": "Juniper",
+          "type": "Transfer pump",
+          "criticality": "High",
+          "ageYears": 4,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.9,
+          "currentTemp": 62.3,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 77,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:08.551Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
+          "events": 12,
+          "hours": 192.73,
+          "partsHours": 14.81,
+          "loss": 157412
+        },
+        {
           "id": "A009",
+          "siteId": "S03",
+          "siteName": "Juniper",
           "type": "Compressor",
+          "criticality": "High",
+          "ageYears": 6,
+          "vibNormal": 3.4,
+          "tempNormal": 76,
+          "currentVib": 3.5,
+          "currentTemp": 78.6,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 50,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:15.523Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 13,
           "hours": 153.46,
-          "partsHours": 0.0,
+          "partsHours": 0,
           "loss": 168147.96
         }
       ]
@@ -248,9 +411,9 @@
           "events": 29
         },
         {
-          "name": "Electrical trip",
-          "hours": 241.36,
-          "events": 9
+          "name": "Unknown",
+          "hours": 313.12,
+          "events": 10
         },
         {
           "name": "Process upset",
@@ -258,28 +421,38 @@
           "events": 11
         },
         {
-          "name": "Seal leak",
-          "hours": 230.39,
+          "name": "Electrical trip",
+          "hours": 241.36,
           "events": 9
         },
         {
-          "name": "Unknown",
-          "hours": 313.12,
-          "events": 10
+          "name": "Seal leak",
+          "hours": 230.39,
+          "events": 9
         }
       ],
       "assets": [
         {
-          "id": "A010",
-          "type": "Transfer pump",
-          "events": 23,
-          "hours": 599.3,
-          "partsHours": 168.03,
-          "loss": 726730.71
-        },
-        {
           "id": "A011",
+          "siteId": "S04",
+          "siteName": "Arroyo",
           "type": "Lift pump",
+          "criticality": "Medium",
+          "ageYears": 12,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 3.04,
+          "currentTemp": 61.6,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 71,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:55.821Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 22,
           "hours": 696.27,
           "partsHours": 265.56,
@@ -287,11 +460,55 @@
         },
         {
           "id": "A012",
+          "siteId": "S04",
+          "siteName": "Arroyo",
           "type": "Compressor",
+          "criticality": "High",
+          "ageYears": 14,
+          "vibNormal": 3.4,
+          "tempNormal": 76,
+          "currentVib": 3.75,
+          "currentTemp": 73.6,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 57,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:07.697Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 23,
           "hours": 690.55,
           "partsHours": 211.22,
           "loss": 684219.79
+        },
+        {
+          "id": "A010",
+          "siteId": "S04",
+          "siteName": "Arroyo",
+          "type": "Transfer pump",
+          "criticality": "High",
+          "ageYears": 15,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 3.19,
+          "currentTemp": 64.6,
+          "status": "warning",
+          "statusReason": "Latest valid snapshot exceeds the prototype vibration rule or contains an abnormal observation",
+          "abnormalCount": 67,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:17.405Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
+          "events": 23,
+          "hours": 599.3,
+          "partsHours": 168.03,
+          "loss": 726730.71
         }
       ]
     },
@@ -321,14 +538,14 @@
           "events": 14
         },
         {
-          "name": "Electrical trip",
-          "hours": 141.58,
-          "events": 9
-        },
-        {
           "name": "Process upset",
           "hours": 189.66,
           "events": 12
+        },
+        {
+          "name": "Electrical trip",
+          "hours": 141.58,
+          "events": 9
         },
         {
           "name": "Seal leak",
@@ -344,27 +561,81 @@
       "assets": [
         {
           "id": "A013",
+          "siteId": "S05",
+          "siteName": "Canyon",
           "type": "Transfer pump",
+          "criticality": "High",
+          "ageYears": 8,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 3.13,
+          "currentTemp": 60.1,
+          "status": "warning",
+          "statusReason": "Latest valid snapshot exceeds the prototype vibration rule or contains an abnormal observation",
+          "abnormalCount": 64,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:35.760Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 16,
           "hours": 312.88,
           "partsHours": 96.05,
           "loss": 210216.13
         },
         {
-          "id": "A014",
-          "type": "Lift pump",
-          "events": 15,
-          "hours": 257.55,
-          "partsHours": 37.73,
-          "loss": 152660.65
-        },
-        {
           "id": "A015",
+          "siteId": "S05",
+          "siteName": "Canyon",
           "type": "Compressor",
+          "criticality": "High",
+          "ageYears": 9,
+          "vibNormal": 3.4,
+          "tempNormal": 76,
+          "currentVib": 3.89,
+          "currentTemp": 75.1,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 38,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:54.355Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 15,
           "hours": 274.11,
           "partsHours": 61.13,
           "loss": 231603.36
+        },
+        {
+          "id": "A014",
+          "siteId": "S05",
+          "siteName": "Canyon",
+          "type": "Lift pump",
+          "criticality": "Medium",
+          "ageYears": 6,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.81,
+          "currentTemp": 63.2,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 88,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:54.594Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
+          "events": 15,
+          "hours": 257.55,
+          "partsHours": 37.73,
+          "loss": 152660.65
         }
       ]
     },
@@ -416,8 +687,52 @@
       ],
       "assets": [
         {
+          "id": "A018",
+          "siteId": "S06",
+          "siteName": "Prairie",
+          "type": "Compressor",
+          "criticality": "High",
+          "ageYears": 8,
+          "vibNormal": 3.4,
+          "tempNormal": 76,
+          "currentVib": 3.35,
+          "currentTemp": 78.2,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 50,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:36.646Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
+          "events": 20,
+          "hours": 447.65,
+          "partsHours": 147.9,
+          "loss": 352306.34
+        },
+        {
           "id": "A016",
+          "siteId": "S06",
+          "siteName": "Prairie",
           "type": "Transfer pump",
+          "criticality": "High",
+          "ageYears": 10,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.27,
+          "currentTemp": 63.8,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 85,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:53.169Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 18,
           "hours": 352.93,
           "partsHours": 89.34,
@@ -425,21 +740,1165 @@
         },
         {
           "id": "A017",
+          "siteId": "S06",
+          "siteName": "Prairie",
           "type": "Lift pump",
+          "criticality": "Medium",
+          "ageYears": 7,
+          "vibNormal": 2.7,
+          "tempNormal": 62,
+          "currentVib": 2.95,
+          "currentTemp": 64.4,
+          "status": "optimal",
+          "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+          "abnormalCount": 89,
+          "latestNote": "",
+          "observedUtc": "2025-12-31T06:00:00.000Z",
+          "receivedUtc": "2025-12-31T06:00:55.694Z",
+          "readingQuality": "Valid",
+          "operatingState": "Running",
+          "isStale": false,
+          "isHistorical": true,
           "events": 17,
           "hours": 279.75,
           "partsHours": 10.87,
           "loss": 181822.04
-        },
-        {
-          "id": "A018",
-          "type": "Compressor",
-          "events": 20,
-          "hours": 447.65,
-          "partsHours": 147.9,
-          "loss": 352306.34
         }
       ]
     }
-  ]
+  ],
+  "equipment": [
+    {
+      "id": "A002",
+      "siteId": "S01",
+      "siteName": "Cedar",
+      "type": "Lift pump",
+      "criticality": "Medium",
+      "ageYears": 6,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.79,
+      "currentTemp": 63.7,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 83,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:39.041Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 17,
+      "hours": 294.21,
+      "partsHours": 40,
+      "loss": 165527.9
+    },
+    {
+      "id": "A003",
+      "siteId": "S01",
+      "siteName": "Cedar",
+      "type": "Compressor",
+      "criticality": "High",
+      "ageYears": 11,
+      "vibNormal": 3.4,
+      "tempNormal": 76,
+      "currentVib": 3.44,
+      "currentTemp": 78.2,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 36,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:54.131Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 14,
+      "hours": 245.92,
+      "partsHours": 36.56,
+      "loss": 241372.09
+    },
+    {
+      "id": "A001",
+      "siteId": "S01",
+      "siteName": "Cedar",
+      "type": "Transfer pump",
+      "criticality": "High",
+      "ageYears": 9,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 3.15,
+      "currentTemp": 60.7,
+      "status": "warning",
+      "statusReason": "Latest valid snapshot exceeds the prototype vibration rule or contains an abnormal observation",
+      "abnormalCount": 77,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:40.174Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 17,
+      "hours": 275.76,
+      "partsHours": 33.89,
+      "loss": 208881.79
+    },
+    {
+      "id": "A005",
+      "siteId": "S02",
+      "siteName": "Mesa",
+      "type": "Lift pump",
+      "criticality": "Medium",
+      "ageYears": 10,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.34,
+      "currentTemp": 65.5,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 85,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:53.147Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 20,
+      "hours": 452.27,
+      "partsHours": 130.56,
+      "loss": 346912.99
+    },
+    {
+      "id": "A004",
+      "siteId": "S02",
+      "siteName": "Mesa",
+      "type": "Transfer pump",
+      "criticality": "High",
+      "ageYears": 13,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.92,
+      "currentTemp": 59.7,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 87,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:21.572Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 17,
+      "hours": 390.52,
+      "partsHours": 101.06,
+      "loss": 406480.41
+    },
+    {
+      "id": "A006",
+      "siteId": "S02",
+      "siteName": "Mesa",
+      "type": "Compressor",
+      "criticality": "High",
+      "ageYears": 7,
+      "vibNormal": 3.4,
+      "tempNormal": 76,
+      "currentVib": 2.86,
+      "currentTemp": 76.4,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 53,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:57.573Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 19,
+      "hours": 403.61,
+      "partsHours": 94.99,
+      "loss": 278801.36
+    },
+    {
+      "id": "A008",
+      "siteId": "S03",
+      "siteName": "Juniper",
+      "type": "Lift pump",
+      "criticality": "Medium",
+      "ageYears": 5,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.92,
+      "currentTemp": 58.1,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 73,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:55.476Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 15,
+      "hours": 279.08,
+      "partsHours": 73.62,
+      "loss": 181194.22
+    },
+    {
+      "id": "A007",
+      "siteId": "S03",
+      "siteName": "Juniper",
+      "type": "Transfer pump",
+      "criticality": "High",
+      "ageYears": 4,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.9,
+      "currentTemp": 62.3,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 77,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:08.551Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 12,
+      "hours": 192.73,
+      "partsHours": 14.81,
+      "loss": 157412
+    },
+    {
+      "id": "A009",
+      "siteId": "S03",
+      "siteName": "Juniper",
+      "type": "Compressor",
+      "criticality": "High",
+      "ageYears": 6,
+      "vibNormal": 3.4,
+      "tempNormal": 76,
+      "currentVib": 3.5,
+      "currentTemp": 78.6,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 50,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:15.523Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 13,
+      "hours": 153.46,
+      "partsHours": 0,
+      "loss": 168147.96
+    },
+    {
+      "id": "A011",
+      "siteId": "S04",
+      "siteName": "Arroyo",
+      "type": "Lift pump",
+      "criticality": "Medium",
+      "ageYears": 12,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 3.04,
+      "currentTemp": 61.6,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 71,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:55.821Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 22,
+      "hours": 696.27,
+      "partsHours": 265.56,
+      "loss": 606508.74
+    },
+    {
+      "id": "A012",
+      "siteId": "S04",
+      "siteName": "Arroyo",
+      "type": "Compressor",
+      "criticality": "High",
+      "ageYears": 14,
+      "vibNormal": 3.4,
+      "tempNormal": 76,
+      "currentVib": 3.75,
+      "currentTemp": 73.6,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 57,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:07.697Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 23,
+      "hours": 690.55,
+      "partsHours": 211.22,
+      "loss": 684219.79
+    },
+    {
+      "id": "A010",
+      "siteId": "S04",
+      "siteName": "Arroyo",
+      "type": "Transfer pump",
+      "criticality": "High",
+      "ageYears": 15,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 3.19,
+      "currentTemp": 64.6,
+      "status": "warning",
+      "statusReason": "Latest valid snapshot exceeds the prototype vibration rule or contains an abnormal observation",
+      "abnormalCount": 67,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:17.405Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 23,
+      "hours": 599.3,
+      "partsHours": 168.03,
+      "loss": 726730.71
+    },
+    {
+      "id": "A013",
+      "siteId": "S05",
+      "siteName": "Canyon",
+      "type": "Transfer pump",
+      "criticality": "High",
+      "ageYears": 8,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 3.13,
+      "currentTemp": 60.1,
+      "status": "warning",
+      "statusReason": "Latest valid snapshot exceeds the prototype vibration rule or contains an abnormal observation",
+      "abnormalCount": 64,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:35.760Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 16,
+      "hours": 312.88,
+      "partsHours": 96.05,
+      "loss": 210216.13
+    },
+    {
+      "id": "A015",
+      "siteId": "S05",
+      "siteName": "Canyon",
+      "type": "Compressor",
+      "criticality": "High",
+      "ageYears": 9,
+      "vibNormal": 3.4,
+      "tempNormal": 76,
+      "currentVib": 3.89,
+      "currentTemp": 75.1,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 38,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:54.355Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 15,
+      "hours": 274.11,
+      "partsHours": 61.13,
+      "loss": 231603.36
+    },
+    {
+      "id": "A014",
+      "siteId": "S05",
+      "siteName": "Canyon",
+      "type": "Lift pump",
+      "criticality": "Medium",
+      "ageYears": 6,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.81,
+      "currentTemp": 63.2,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 88,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:54.594Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 15,
+      "hours": 257.55,
+      "partsHours": 37.73,
+      "loss": 152660.65
+    },
+    {
+      "id": "A018",
+      "siteId": "S06",
+      "siteName": "Prairie",
+      "type": "Compressor",
+      "criticality": "High",
+      "ageYears": 8,
+      "vibNormal": 3.4,
+      "tempNormal": 76,
+      "currentVib": 3.35,
+      "currentTemp": 78.2,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 50,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:36.646Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 20,
+      "hours": 447.65,
+      "partsHours": 147.9,
+      "loss": 352306.34
+    },
+    {
+      "id": "A016",
+      "siteId": "S06",
+      "siteName": "Prairie",
+      "type": "Transfer pump",
+      "criticality": "High",
+      "ageYears": 10,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.27,
+      "currentTemp": 63.8,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 85,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:53.169Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 18,
+      "hours": 352.93,
+      "partsHours": 89.34,
+      "loss": 307591.13
+    },
+    {
+      "id": "A017",
+      "siteId": "S06",
+      "siteName": "Prairie",
+      "type": "Lift pump",
+      "criticality": "Medium",
+      "ageYears": 7,
+      "vibNormal": 2.7,
+      "tempNormal": 62,
+      "currentVib": 2.95,
+      "currentTemp": 64.4,
+      "status": "optimal",
+      "statusReason": "Within the prototype vibration rule in latest valid snapshot",
+      "abnormalCount": 89,
+      "latestNote": "",
+      "observedUtc": "2025-12-31T06:00:00.000Z",
+      "receivedUtc": "2025-12-31T06:00:55.694Z",
+      "readingQuality": "Valid",
+      "operatingState": "Running",
+      "isStale": false,
+      "isHistorical": true,
+      "events": 17,
+      "hours": 279.75,
+      "partsHours": 10.87,
+      "loss": 181822.04
+    }
+  ],
+  "parserVersion": 2,
+  "sensorAsOf": "2025-12-31T12:00:00.000Z",
+  "sensorRules": {
+    "vibrationMultiplier": 1.15,
+    "staleAfterHours": 48,
+    "validatedAlarmThreshold": false
+  },
+  "dataQuality": {
+    "tables": {
+      "Assets": {
+        "rawRows": 18,
+        "cleanRows": 18,
+        "duplicatesRemoved": 0
+      },
+      "Production": {
+        "rawRows": 218,
+        "cleanRows": 216,
+        "duplicatesRemoved": 2
+      },
+      "Events": {
+        "rawRows": 387,
+        "cleanRows": 385,
+        "duplicatesRemoved": 2
+      },
+      "HSE": {
+        "rawRows": 72,
+        "cleanRows": 36,
+        "duplicatesRemoved": 36
+      },
+      "Readings": {
+        "rawRows": 13164,
+        "cleanRows": 6570,
+        "duplicatesRemoved": 6594
+      },
+      "Solutions": {
+        "rawRows": 6,
+        "cleanRows": 6,
+        "duplicatesRemoved": 0
+      }
+    },
+    "counts": {
+      "unitsNormalized": 3,
+      "derivedValuesRecovered": 7,
+      "unknownPartsInvoice": 14,
+      "idsNormalized": 8,
+      "fahrenheitConverted": 4,
+      "missingReading": 339,
+      "delayedReadingOverOneHour": 102,
+      "suspectReading": 58
+    },
+    "issues": [
+      {
+        "code": "unitsNormalized",
+        "table": "Assets",
+        "key": "A001",
+        "field": "modeled_capacity_bbl_hr"
+      },
+      {
+        "code": "unitsNormalized",
+        "table": "Assets",
+        "key": "A007",
+        "field": "modeled_capacity_bbl_hr"
+      },
+      {
+        "code": "unitsNormalized",
+        "table": "Assets",
+        "key": "A013",
+        "field": "modeled_capacity_bbl_hr"
+      },
+      {
+        "code": "derivedValuesRecovered",
+        "table": "Production",
+        "key": "A001_2025-06",
+        "field": "potential_oil_bbl",
+        "originalValue": null,
+        "cleanedValue": 15840
+      },
+      {
+        "code": "derivedValuesRecovered",
+        "table": "Production",
+        "key": "A008_2025-12",
+        "field": "potential_oil_bbl",
+        "originalValue": null,
+        "cleanedValue": 13392
+      },
+      {
+        "code": "derivedValuesRecovered",
+        "table": "Production",
+        "key": "A013_2025-12",
+        "field": "potential_oil_bbl",
+        "originalValue": null,
+        "cleanedValue": 15624
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0001",
+        "field": "parts_usd"
+      },
+      {
+        "code": "derivedValuesRecovered",
+        "table": "Events",
+        "key": "E0012",
+        "field": "stopped_hours",
+        "originalValue": null,
+        "cleanedValue": 4.82
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0030",
+        "field": "parts_usd"
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "a003",
+        "field": "asset_id"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0059",
+        "field": "parts_usd"
+      },
+      {
+        "code": "derivedValuesRecovered",
+        "table": "Events",
+        "key": "E0072",
+        "field": "stopped_hours",
+        "originalValue": null,
+        "cleanedValue": 4.04
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0088",
+        "field": "parts_usd"
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "a006",
+        "field": "asset_id"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0117",
+        "field": "parts_usd"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0146",
+        "field": "parts_usd"
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "8",
+        "field": "asset_id"
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "A09",
+        "field": "asset_id"
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "A09",
+        "field": "asset_id"
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "A09",
+        "field": "asset_id"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0175",
+        "field": "parts_usd"
+      },
+      {
+        "code": "derivedValuesRecovered",
+        "table": "Events",
+        "key": "E0192",
+        "field": "stopped_hours",
+        "originalValue": null,
+        "cleanedValue": 34.769999999999996
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "a010",
+        "field": "asset_id"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0204",
+        "field": "parts_usd"
+      },
+      {
+        "code": "idsNormalized",
+        "table": "Events",
+        "key": "11",
+        "field": "asset_id"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0233",
+        "field": "parts_usd"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0262",
+        "field": "parts_usd"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0291",
+        "field": "parts_usd"
+      },
+      {
+        "code": "derivedValuesRecovered",
+        "table": "Events",
+        "key": "E0292",
+        "field": "stopped_hours",
+        "originalValue": null,
+        "cleanedValue": 13.700000000000001
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0320",
+        "field": "parts_usd"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0349",
+        "field": "parts_usd"
+      },
+      {
+        "code": "unknownPartsInvoice",
+        "table": "Events",
+        "key": "E0378",
+        "field": "parts_usd"
+      },
+      {
+        "code": "fahrenheitConverted",
+        "table": "Readings",
+        "key": "R00011",
+        "field": "temperature_c"
+      },
+      {
+        "code": "fahrenheitConverted",
+        "table": "Readings",
+        "key": "R00711",
+        "field": "temperature_c"
+      },
+      {
+        "code": "fahrenheitConverted",
+        "table": "Readings",
+        "key": "R01511",
+        "field": "temperature_c"
+      },
+      {
+        "code": "fahrenheitConverted",
+        "table": "Readings",
+        "key": "R02911",
+        "field": "temperature_c"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R02556",
+        "field": "quality"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03286"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03651"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04016",
+        "field": "quality"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R04016"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01827",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01829",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R02194",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R02925",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04751",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R05481",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03291",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03657",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03658",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R06215",
+        "field": "quality"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03297"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03662"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R04027"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R06218",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R05126",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R05492",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01478",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04398",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04033",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R04035",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03305",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01845",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R06225",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04036",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01117",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R02212",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R00753",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01483",
+        "field": "quality"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03308"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03673"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R04038"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R06230",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04040",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R02217",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03312",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R05867",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R05138",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R01488",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R00759",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R00760",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03681",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R04412",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R05507",
+        "field": "quality"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03319"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03684"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R04049"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03321",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R03686",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R05512",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R00037",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04055",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01500",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04421",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R02596",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R04787",
+        "field": "quality"
+      },
+      {
+        "code": "suspectReading",
+        "table": "Readings",
+        "key": "R01502",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R03328",
+        "field": "quality"
+      },
+      {
+        "code": "missingReading",
+        "table": "Readings",
+        "key": "R01505",
+        "field": "quality"
+      },
+      {
+        "code": "delayedReadingOverOneHour",
+        "table": "Readings",
+        "key": "R03330"
+      }
+    ],
+    "reconciliation": {
+      "checkedAssetMonths": 216,
+      "toleranceBbl": 0.011,
+      "productionMatched": true
+    },
+    "remainingUnknowns": {
+      "partsInvoices": 14,
+      "missingReadings": 339,
+      "suspectReadings": 58
+    }
+  }
 }
