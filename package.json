@@ -8,6 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node --test",
+    "snapshot": "node scripts/build-snapshot.mjs",
     "preview": "vite preview",
     "deploy": "wrangler deploy --config wrangler.jsonc",
     "deploy:check": "wrangler deploy --config wrangler.jsonc --dry-run",

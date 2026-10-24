@@ -1,0 +1,40 @@
+:root {
+  --cq-color-ink: #111827;
+  --cq-color-muted: #6b7280;
+  --cq-color-subtle: #9ca3af;
+  --cq-color-border: #e5e7eb;
+  --cq-color-border-strong: #d1d5db;
+  --cq-color-surface: #ffffff;
+  --cq-color-canvas: #f9fafb;
+  --cq-color-primary: #2563eb;
+  --cq-color-primary-soft: #eff6ff;
+  --cq-color-primary-border: #bfdbfe;
+  --cq-color-success: #047857;
+  --cq-color-success-soft: #ecfdf5;
+  --cq-color-warning: #b45309;
+  --cq-color-warning-soft: #fffbeb;
+  --cq-color-danger: #b91c1c;
+  --cq-color-danger-soft: #fef2f2;
+  --cq-radius-sm: 4px;
+  --cq-radius-md: 7px;
+  --cq-radius-lg: 8px;
+  --cq-shadow-panel: 0 2px 3px rgba(17, 24, 39, 0.02);
+  --cq-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.22);
+  --cq-space-1: 4px;
+  --cq-space-2: 8px;
+  --cq-space-3: 12px;
+  --cq-space-4: 16px;
+  --cq-space-5: 20px;
+  --cq-space-6: 24px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--cq-color-primary);
+  outline-offset: 3px;
+  box-shadow: var(--cq-focus-ring);
+}
