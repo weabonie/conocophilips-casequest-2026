@@ -6,6 +6,7 @@ In Cloudflare **Settings → Build**, use:
 
 - Build command: `pnpm run build`
 - Deploy command: `pnpm run deploy`
+- Preview command (non-production branches): `npx wrangler preview`
 - Root directory: repository root
 
 `wrangler.jsonc` is the deployment configuration. Do not pass `vite.config.js`
