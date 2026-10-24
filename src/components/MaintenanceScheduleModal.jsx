@@ -6,8 +6,6 @@ import {
   Calendar,
   AlertTriangle,
   CheckCircle2,
-  ShieldAlert,
-  Info,
   Layers,
   Package,
   ClipboardCheck,
@@ -97,8 +95,6 @@ function MaintenanceModalForm({
     hasConfirmedReservation,
     status,
   })
-
-  const hasCriticalHSE = site && site.criticalActions > 0
 
   // Remaining blockers for scheduling
   const blockers = []
@@ -254,31 +250,6 @@ function MaintenanceModalForm({
                   {number(asset.partsHours, 1)} hrs
                 </span>
               </div>
-            </div>
-
-            {/* HSE Visibility & Safety Rules */}
-            <div className={`maint-hse-banner ${hasCriticalHSE ? 'hse-warning' : 'hse-normal'}`}>
-              {hasCriticalHSE ? (
-                <>
-                  <ShieldAlert size={16} className="text-amber-700 flex-shrink-0" />
-                  <div>
-                    <strong>HSE Hold Active for {site?.name || 'Site'}:</strong>
-                    <span>
-                      Site has {site?.criticalActions} open critical HSE action(s). Open critical actions block site pilot work until supervisor-verified closure. This request saves as a prototype planning entry and does not authorize physical field execution.
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Info size={15} className="text-blue-700 flex-shrink-0" />
-                  <div>
-                    <strong>Prototype Planning Workflow:</strong>
-                    <span>
-                      No critical HSE actions open for {site?.name || 'Site'}. Physical field execution requires qualified supervisor work authorization and standard permit-to-work procedures.
-                    </span>
-                  </div>
-                </>
-              )}
             </div>
           </div>
 
