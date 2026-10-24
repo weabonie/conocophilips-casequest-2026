@@ -1,7 +1,7 @@
 import { lazy } from 'react'
 const load = path => lazy(path)
 export const routes = [
- { path:'/', title:'Home', component:load(() => import('../features/home/index.jsx')) },
+ { path:'/', title:'Home', component:load(() => import('./HomeRoute.jsx')) },
  { path:'/overview', title:'Operations overview', component:load(() => import('../features/overview/index.jsx')) },
  { path:'/sites/:siteId', title:'Site details', hidden:true, component:load(() => import('../features/site/index.jsx')) },
  { path:'/equipment', title:'Equipment & Health', equipment:true },
@@ -14,5 +14,5 @@ export const routes = [
  { path:'/activity', title:'Activity log', component:load(() => import('../features/activity/index.jsx')) },
  { path:'/how-it-works', title:'How it works', component:load(() => import('../features/how-it-works/index.jsx')) },
 ]
-export function matchRoute(hash) { const path = (hash || '#/overview').replace(/^#/, '') || '/'; const route = routes.find(r => r.path === path || r.path === '/sites/:siteId' && /^\/sites\/[^/]+$/.test(path)); return { route:route || routes[1], params:route?.path.includes(':siteId') ? { siteId:decodeURIComponent(path.split('/')[2]) } : {} } }
+export function matchRoute(hash) { const [rawPath, queryString = ''] = (hash || '#/overview').replace(/^#/, '').split('?'); const path = rawPath || '/'; const query = Object.fromEntries(new URLSearchParams(queryString)); const route = routes.find(r => r.path === path || r.path === '/sites/:siteId' && /^\/sites\/[^/]+$/.test(path)); return { route:route || routes[1], query, params:route?.path.includes(':siteId') ? { siteId:decodeURIComponent(path.split('/')[2]) } : {} } }
 export function visibleRoutes(user) { return routes.filter(r => !r.hidden && (!r.roles || r.roles.includes(user?.role))) }
