@@ -468,11 +468,10 @@ export default function MaintenanceQueueTable({
         </div>
       )}
 
-      {/* Queue Disclaimer & Realism Separator */}
+      {/* Queue Footer */}
       <div className="queue-footer-note">
         <span>
-          <strong>Prototype Planning Storage:</strong> Work orders persist locally in browser storage (key: <code>cq_prototype_maintenance_requests_v1</code>).
-          Entries do not modify 2025 historical Excel records. Field execution requires qualified supervisor work permits and HSE verification.
+          Work orders persist in local browser storage (key: <code>cq_prototype_maintenance_requests_v1</code>).
         </span>
       </div>
     </section>

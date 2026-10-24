@@ -8,6 +8,23 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request)
+    // Demo role switching is client controlled. Do not open a paid model proxy
+    // or trust browser-supplied roles/context without authenticated server scope.
+    if (url.pathname === '/api/copilot') {
+      if (request.method !== 'POST') return Response.json({ success: false, error: 'Method not allowed' }, { status: 405, headers: { Allow: 'POST' } })
+      const size = Number(request.headers.get('content-length') || 0)
+      if (size > 4096) return Response.json({ success: false, error: 'Question payload is too large' }, { status: 413 })
+      let body
+      try {
+        const raw = await request.text()
+        if (raw.length > 4096) return Response.json({ success: false, error: 'Question payload is too large' }, { status: 413 })
+        body = JSON.parse(raw)
+      } catch { return Response.json({ success: false, error: 'Invalid JSON body' }, { status: 400 }) }
+      if (typeof body?.question !== 'string' || !body.question.trim() || body.question.length > 1000) return Response.json({ success: false, error: 'Enter a question of up to 1,000 characters' }, { status: 400 })
+      // Even a configured API key cannot enable this route by itself. Offline
+      // answers remain available in the UI; no credentials or context are sent.
+      return Response.json({ success: false, mode: 'offline', error: 'Live answers are unavailable. Use the sourced offline Copilot.' }, { status: 503, headers: { 'Cache-Control': 'no-store' } })
+    }
     if (url.pathname !== '/api/sync-excel') return Response.json({ success: false, error: 'Not found' }, { status: 404 })
     if (!['GET', 'POST'].includes(request.method)) return Response.json({ success: false, error: 'Method not allowed' }, { status: 405, headers: { Allow: 'GET, POST' } })
 

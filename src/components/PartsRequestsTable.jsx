@@ -1,3 +1,6 @@
+import { useCurrentUser } from '../domain/auth.js'
+import { can, ACTIONS } from '../domain/permissions.js'
+import { PermissionNote } from '../ui/index.jsx'
 import { useState, useMemo } from 'react'
 import {
   Package,
@@ -23,6 +26,8 @@ export default function PartsRequestsTable({
   onRecordReceipt,
   selectedSite,
 }) {
+  const user = useCurrentUser()
+  const [actionError, setActionError] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all') // 'all' | 'pending' | 'approved' | 'received'
   const [expandedHistoryId, setExpandedHistoryId] = useState(null)
@@ -68,7 +73,7 @@ export default function PartsRequestsTable({
   const handleOpenActionModal = (type, req) => {
     let initialInput = ''
     if (type === 'approve') initialInput = 'Approved for prototype maintenance staging'
-    if (type === 'reject') initialInput = 'Insufficient operational justification'
+    if (type === 'reject') initialInput = ''
     if (type === 'editQty') initialInput = String(req.requestedQty || 1)
     setActiveActionModal({ type, request: req, inputVal: initialInput })
   }
@@ -77,12 +82,16 @@ export default function PartsRequestsTable({
     if (!activeActionModal) return
     const { type, request, inputVal } = activeActionModal
 
+    if (!can(user, ACTIONS.DECIDE_REORDER, request)) { setActionError('Planner permission is required.'); return }
+    if (type === 'reject' && !inputVal.trim()) { setActionError('A rejection reason is required.'); return }
+    if (type === 'editQty' && (!Number.isInteger(Number(inputVal)) || Number(inputVal) < 1)) { setActionError('Enter a positive whole quantity.'); return }
+    setActionError('')
     if (type === 'approve') {
       onApprove(request.id, inputVal.trim())
     } else if (type === 'reject') {
       onReject(request.id, inputVal.trim())
     } else if (type === 'editQty') {
-      const qNum = parseInt(inputVal, 10) || 1
+      const qNum = Number(inputVal)
       onEditQty(request.id, qNum)
     } else if (type === 'receipt') {
       onRecordReceipt(request.id)
@@ -234,7 +243,7 @@ export default function PartsRequestsTable({
                       <span
                         className={`priority-pill ${req.priority === 'Urgent' ? 'priority-urgent' : 'priority-std'}`}
                       >
-                        {req.priority}
+                        {req.priority === 'Urgent' ? 'Warning · Urgent' : req.priority}
                       </span>
                     </div>
                   </td>
@@ -245,7 +254,7 @@ export default function PartsRequestsTable({
                       {req.reason}
                     </span>
                     <small className="data-backed-context-sub">
-                      2025 parts wait: <strong>{req.historicalWaitHours || 0} hrs</strong>
+                      2025 parts wait: <strong>{req.historicalWaitHours ?? 'unknown'} hrs</strong>
                     </small>
                   </td>
 
@@ -291,7 +300,7 @@ export default function PartsRequestsTable({
                   {/* Actions & History Toggle */}
                   <td>
                     <div className="table-actions-cell">
-                      {isPending && (
+                      {isPending && can(user, ACTIONS.DECIDE_REORDER, req) && (
                         <>
                           <button
                             type="button"
@@ -323,7 +332,7 @@ export default function PartsRequestsTable({
                         </>
                       )}
 
-                      {isApproved && (
+                      {isApproved && can(user, ACTIONS.DECIDE_REORDER, req) && (
                         <button
                           type="button"
                           className="btn-action btn-record-receipt"
@@ -342,6 +351,7 @@ export default function PartsRequestsTable({
                         </span>
                       )}
 
+                      {!can(user, ACTIONS.DECIDE_REORDER, req) && <PermissionNote />}
                       {/* Expandable History Toggle Button */}
                       <button
                         type="button"
@@ -450,6 +460,7 @@ export default function PartsRequestsTable({
             </div>
 
             <div className="modal-body">
+              {actionError && <p role="alert">{actionError}</p>}
               {activeActionModal.type === 'approve' && (
                 <div className="form-group">
                   <p className="text-xs text-slate-600 mb-2">

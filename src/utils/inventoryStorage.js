@@ -1,7 +1,19 @@
+import { logActivity, EVENT_TYPES } from '../domain/activityLog.js'
+import { authStore } from '../domain/auth.js'
+import { can, ACTIONS } from '../domain/permissions.js'
+
+const actorFor = user => typeof user === 'object' && user ? user : authStore.get()
+const permitted = (user, action, siteId) => can(actorFor(user), action, { siteId })
+const validQty = qty => Number.isInteger(qty) && qty > 0
+const legacyLog = (user,type,req,reason) => { if (typeof user !== 'object') logActivity(actorFor(user), {type,siteId:req.siteId,assetId:req.assetId,entityId:req.id,reason}) }
+const emitParts = () => { if (typeof window !== 'undefined') window.dispatchEvent(new Event('cq-parts-changed')) }
+const denied = () => ({ success: false, reason: 'Your role cannot perform this action for this site.' })
+
 export const INVENTORY_STORAGE_KEY = 'cq_prototype_inventory_v2'
 export const PARTS_REQUESTS_STORAGE_KEY = 'cq_prototype_parts_requests_v1'
 
 export const SAMPLE_PARTS_CATALOG = [
+  {partId:'PB-270',partName:'Pump bearing kit (sample specification)',category:'Pumps',unit:'kit',minStock:2,applicableTypes:['Transfer pump','Lift pump'],description:'Illustrative pump bearing kit; fit must be confirmed before procurement.'},
   {
     partId: 'SK-58B',
     partName: 'Mechanical Seal Kit (Type 58B)',
@@ -398,10 +410,13 @@ export const SAMPLE_INVENTORY_SEED = [
   },
 ]
 
+// Independent demonstration quantities, not inferred from site fill rates.
+for (const [siteId,siteName,qty] of [['S01','Cedar',3],['S02','Mesa',1],['S03','Juniper',2],['S04','Arroyo',0],['S05','Canyon',2],['S06','Prairie',1]]) SAMPLE_INVENTORY_SEED.push({id:`${siteId}_PB-270`,siteId,siteName,partId:'PB-270',partName:'Pump bearing kit (sample specification)',category:'Pumps',unit:'kit',minStock:2,onHand:qty,reserved:0,reservations:[],location:`${siteName} parts storage (sample)`})
+
 export const INITIAL_PARTS_REQUESTS_SEED = [
   {
     id: 'PR-001',
-    assetId: 'A004',
+    assetId: 'A006',
     assetType: 'Compressor',
     siteId: 'S02',
     siteName: 'Mesa',
@@ -412,8 +427,8 @@ export const INITIAL_PARTS_REQUESTS_SEED = [
     sourceSiteId: null,
     sourceSiteName: null,
     priority: 'Urgent',
-    reason: 'Stockout for upcoming maintenance: vibration elevated in 2025 logs (40.0 hrs parts wait)',
-    historicalWaitHours: 40.0,
+    reason: 'Sample planning request: confirm compressor bearing kit fit and stock before maintenance.',
+    historicalWaitHours: null,
     requestedDate: '2026-10-24T10:30:00.000Z',
     requestedBy: 'Operations Planner',
     status: 'Pending review',
@@ -429,7 +444,7 @@ export const INITIAL_PARTS_REQUESTS_SEED = [
         action: 'Reorder requested',
         by: 'Operations Planner',
         timestamp: '2026-10-24T10:30:00.000Z',
-        note: 'Requested 1 kit due to stockout at Mesa. Historical parts wait: 40.0 hrs.',
+        note: 'Sample request for planner review; stock levels are illustrative.',
       },
     ],
   },
@@ -440,7 +455,7 @@ export function createHistoryEntry(action, by = 'Operations Planner', note = '')
   return {
     id: 'H-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6),
     action,
-    by: by || 'Operations Planner',
+    by: actorFor(by)?.name || by || 'Operations Planner',
     timestamp: new Date().toISOString(),
     note: note || '',
   }
@@ -452,10 +467,13 @@ export function loadInventory() {
     const raw = localStorage.getItem(INVENTORY_STORAGE_KEY)
     if (raw === null) {
       localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(SAMPLE_INVENTORY_SEED))
-      return SAMPLE_INVENTORY_SEED
+      return structuredClone(SAMPLE_INVENTORY_SEED)
     }
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
+    if (!Array.isArray(parsed)) return []
+    const additions = SAMPLE_INVENTORY_SEED.filter(seed => seed.partId === 'PB-270' && !parsed.some(item => item.id === seed.id))
+    if (additions.length) { parsed.push(...structuredClone(additions)); saveInventory(parsed) }
+    return parsed
   } catch (err) {
     console.error('Failed to load inventory from localStorage:', err)
     return []
@@ -465,6 +483,7 @@ export function loadInventory() {
 export function saveInventory(inventory) {
   try {
     localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(inventory))
+    emitParts()
     return true
   } catch (err) {
     console.error('Failed to save inventory to localStorage:', err)
@@ -478,7 +497,7 @@ export function loadPartsRequests() {
     const raw = localStorage.getItem(PARTS_REQUESTS_STORAGE_KEY)
     if (raw === null) {
       localStorage.setItem(PARTS_REQUESTS_STORAGE_KEY, JSON.stringify(INITIAL_PARTS_REQUESTS_SEED))
-      return INITIAL_PARTS_REQUESTS_SEED
+      return structuredClone(INITIAL_PARTS_REQUESTS_SEED)
     }
     const parsed = JSON.parse(raw)
     return Array.isArray(parsed) ? parsed : []
@@ -491,6 +510,7 @@ export function loadPartsRequests() {
 export function savePartsRequests(requests) {
   try {
     localStorage.setItem(PARTS_REQUESTS_STORAGE_KEY, JSON.stringify(requests))
+    emitParts()
     return true
   } catch (err) {
     console.error('Failed to save parts requests to localStorage:', err)
@@ -523,8 +543,9 @@ export function getSuggestedPartsForAsset(asset) {
       },
     ]
   }
-  // Default to Pumps (Transfer pump, Lift pump)
+  // Sample types require equipment fit confirmation.
   return [
+    {partId:"PB-270",partName:"Pump bearing kit (sample specification)",reason:"Suggested bearing part type; confirm fit",defaultQty:1},
     {
       partId: 'SK-58B',
       partName: 'Mechanical Seal Kit (Type 58B)',
@@ -584,6 +605,8 @@ export function getReservationForAsset(assetId, inventoryList = null) {
 
 // Reserve Parts for an Asset (decreases available stock by increasing reserved)
 export function reserveParts(siteId, partId, assetId, qty = 1, user = 'Operations Planner') {
+  if (!permitted(user, ACTIONS.STAGE_PART, siteId)) return denied()
+  if (!validQty(qty)) return { success: false, reason: 'Quantity must be a positive whole number.' }
   const inv = loadInventory()
   const itemIndex = inv.findIndex((i) => i.siteId === siteId && i.partId === partId)
   if (itemIndex === -1) {
@@ -594,7 +617,8 @@ export function reserveParts(siteId, partId, assetId, qty = 1, user = 'Operation
   const currentReserved = item.reserved || 0
   const available = Math.max(0, item.onHand - currentReserved)
 
-  if (available < qty) {
+  const previous = item.reservations?.find(r => r.assetId === assetId)?.qty || 0
+  if (available + previous < qty) {
     return {
       success: false,
       reason: `Insufficient available stock. Available: ${available}, Requested: ${qty}`,
@@ -614,7 +638,7 @@ export function reserveParts(siteId, partId, assetId, qty = 1, user = 'Operation
       ...reservations[existingIdx],
       qty,
       reservedAt: new Date().toISOString(),
-      reservedBy: user,
+      reservedBy: actorFor(user)?.name || user,
     }
   } else {
     item.reserved = currentReserved + qty
@@ -623,7 +647,7 @@ export function reserveParts(siteId, partId, assetId, qty = 1, user = 'Operation
       assetId,
       qty,
       reservedAt: new Date().toISOString(),
-      reservedBy: user,
+      reservedBy: actorFor(user)?.name || user,
     })
   }
 
@@ -633,14 +657,16 @@ export function reserveParts(siteId, partId, assetId, qty = 1, user = 'Operation
 
   return {
     success: true,
-    reservationId,
+    reservationId: existingIdx !== -1 ? reservations[existingIdx].reservationId : reservationId,
     item,
     available: Math.max(0, item.onHand - item.reserved),
   }
 }
 
 // Release Reservation (e.g. When job is canceled, edited, or unreserved)
-export function releaseReservation(siteId, partId, assetId, qty = null) {
+export function releaseReservation(siteId, partId, assetId, qty = null, user = null) {
+  if (!permitted(user, ACTIONS.STAGE_PART, siteId)) return denied()
+  if (qty != null && !validQty(qty)) return { success: false, reason: "Quantity must be a positive whole number." }
   const inv = loadInventory()
   const itemIndex = inv.findIndex((i) => i.siteId === siteId && i.partId === partId)
   if (itemIndex === -1) return { success: false, reason: 'Part not found' }
@@ -654,8 +680,10 @@ export function releaseReservation(siteId, partId, assetId, qty = null) {
   }
 
   const releaseQty = qty != null ? qty : reservations[matchIdx].qty || 0
+  if (releaseQty > reservations[matchIdx].qty) return { success: false, reason: "Cannot release more than reserved." }
   item.reserved = Math.max(0, (item.reserved || 0) - releaseQty)
-  reservations.splice(matchIdx, 1)
+  if (releaseQty === reservations[matchIdx].qty) reservations.splice(matchIdx, 1)
+  else reservations[matchIdx].qty -= releaseQty
   item.reservations = reservations
 
   inv[itemIndex] = item
@@ -665,7 +693,9 @@ export function releaseReservation(siteId, partId, assetId, qty = null) {
 }
 
 // Consume Reserved Parts When Work is Completed (consumes once, reduces both onHand and reserved)
-export function consumeReservedParts(siteId, partId, assetId, qty = 1) {
+export function consumeReservedParts(siteId, partId, assetId, qty = 1, user = null) {
+  if (!permitted(user, ACTIONS.STAGE_PART, siteId)) return denied()
+  if (!validQty(qty)) return { success: false, reason: "Quantity must be a positive whole number." }
   const inv = loadInventory()
   const itemIndex = inv.findIndex((i) => i.siteId === siteId && i.partId === partId)
   if (itemIndex === -1) return { success: false, reason: 'Part not found' }
@@ -674,13 +704,15 @@ export function consumeReservedParts(siteId, partId, assetId, qty = 1) {
   const reservations = Array.isArray(item.reservations) ? [...item.reservations] : []
   const matchIdx = reservations.findIndex((r) => r.assetId === assetId)
 
-  const consumeQty = qty || (matchIdx !== -1 ? reservations[matchIdx].qty : 1)
+  if (matchIdx === -1 || reservations[matchIdx].qty < qty || item.onHand < qty) return { success: false, reason: "No sufficient active reservation; already consumed or unavailable." }
+  const consumeQty = qty
 
   item.onHand = Math.max(0, item.onHand - consumeQty)
   item.reserved = Math.max(0, (item.reserved || 0) - consumeQty)
 
   if (matchIdx !== -1) {
-    reservations.splice(matchIdx, 1)
+    if (reservations[matchIdx].qty === consumeQty) reservations.splice(matchIdx, 1)
+    else reservations[matchIdx].qty -= consumeQty
     item.reservations = reservations
   }
 
@@ -704,11 +736,17 @@ export function getNextPartsRequestId(existingRequests) {
 }
 
 // Create Reorder or Transfer Request
-export function createPartsRequest(data, user = 'Operations Planner') {
+export function createPartsRequest(data, user = 'Operations Planner', dispatchProposal = false) {
+  const allowed = dispatchProposal && data.source === 'pre-dispatch' ? ACTIONS.RUN_DISPATCH_CHECK : ACTIONS.STAGE_PART
+  if (!permitted(user, allowed, data.siteId)) throw new Error('Your role cannot create this request.')
+  if (!validQty(data.requestedQty)) throw new Error('Quantity must be a positive whole number.')
   const requests = loadPartsRequests()
+  const duplicate = data.dedupeKey && requests.find(r => r.dedupeKey === data.dedupeKey && !["Received", "Rejected"].includes(r.status))
+  if (duplicate) return duplicate
   const nextId = getNextPartsRequestId(requests)
 
   const newRequest = {
+    ...data,
     id: nextId,
     assetId: data.assetId,
     assetType: data.assetType || 'Equipment',
@@ -722,9 +760,9 @@ export function createPartsRequest(data, user = 'Operations Planner') {
     sourceSiteName: data.sourceSiteName || null,
     priority: data.priority || 'Standard', // 'Standard' or 'Urgent'
     reason: data.reason || 'Replenishment for maintenance window',
-    historicalWaitHours: Number(data.historicalWaitHours) || 0,
+    historicalWaitHours: data.historicalWaitHours == null ? null : Number(data.historicalWaitHours),
     requestedDate: new Date().toISOString(),
-    requestedBy: user || 'Operations Planner',
+    requestedBy: actorFor(user)?.name || user || 'Operations Planner',
     status: 'Pending review',
     plannerDecision: '',
     decisionDate: null,
@@ -743,6 +781,7 @@ export function createPartsRequest(data, user = 'Operations Planner') {
 
   const updated = [newRequest, ...requests]
   savePartsRequests(updated)
+  legacyLog(user, EVENT_TYPES.REORDER_CREATED, newRequest, newRequest.reason)
   return newRequest
 }
 
@@ -753,14 +792,23 @@ export function approvePartsRequest(requestId, plannerNote = '', user = 'Operati
   if (reqIndex === -1) return { success: false, reason: 'Request not found' }
 
   const req = requests[reqIndex]
+  if (!permitted(user, ACTIONS.DECIDE_REORDER, req.siteId)) return denied()
   if (req.status !== 'Pending review') {
     return { success: false, reason: `Cannot approve request currently in '${req.status}' state` }
   }
 
+  if (req.requestType === 'Site Transfer') {
+    const inv = loadInventory()
+    const source = inv.find(i => i.siteId === req.sourceSiteId && i.partId === req.partId)
+    if (!source || source.onHand - (source.reserved || 0) < req.requestedQty) return { success: false, reason: 'Source stock is no longer available.' }
+    source.movements ||= []
+    if (!source.movements.includes(req.id)) { source.onHand -= req.requestedQty; source.movements.push(req.id); saveInventory(inv) }
+    req.inTransit = true
+  }
   req.status = 'Approved'
   req.plannerDecision = plannerNote || 'Approved for prototype staging'
   req.decisionDate = new Date().toISOString()
-  req.decisionBy = user || 'Operations Planner'
+  req.decisionBy = actorFor(user)?.name || user || 'Operations Planner'
   req.history = req.history || []
   req.history.push(
     createHistoryEntry('Approved', user, req.plannerDecision || 'Approved for staging')
@@ -768,6 +816,7 @@ export function approvePartsRequest(requestId, plannerNote = '', user = 'Operati
 
   requests[reqIndex] = req
   savePartsRequests(requests)
+  legacyLog(user, EVENT_TYPES.REORDER_APPROVED, req, req.plannerDecision)
 
   return { success: true, request: req }
 }
@@ -779,10 +828,13 @@ export function rejectPartsRequest(requestId, reason = '', user = 'Operations Pl
   if (reqIndex === -1) return { success: false, reason: 'Request not found' }
 
   const req = requests[reqIndex]
+  if (!permitted(user, ACTIONS.DECIDE_REORDER, req.siteId)) return denied()
+  if (req.status !== 'Pending review') return { success: false, reason: 'Only pending requests may be rejected.' }
+  if (!reason.trim()) return { success: false, reason: 'A rejection reason is required.' }
   req.status = 'Rejected'
   req.plannerDecision = reason || 'Declined by planner'
   req.decisionDate = new Date().toISOString()
-  req.decisionBy = user || 'Operations Planner'
+  req.decisionBy = actorFor(user)?.name || user || 'Operations Planner'
   req.history = req.history || []
   req.history.push(
     createHistoryEntry('Rejected', user, reason || 'Declined by planner')
@@ -790,6 +842,7 @@ export function rejectPartsRequest(requestId, reason = '', user = 'Operations Pl
 
   requests[reqIndex] = req
   savePartsRequests(requests)
+  legacyLog(user, EVENT_TYPES.REORDER_REJECTED, req, req.plannerDecision)
 
   return { success: true, request: req }
 }
@@ -801,12 +854,14 @@ export function updatePartsRequestQty(requestId, newQty, user = 'Operations Plan
   if (reqIndex === -1) return { success: false, reason: 'Request not found' }
 
   const req = requests[reqIndex]
+  if (!permitted(user, ACTIONS.DECIDE_REORDER, req.siteId)) return denied()
   if (req.status !== 'Pending review') {
     return { success: false, reason: 'Quantity can only be modified while Pending review' }
   }
 
   const oldQty = req.requestedQty
-  const qtyNum = Math.max(1, parseInt(newQty, 10) || 1)
+  if (!validQty(newQty)) return { success: false, reason: 'Quantity must be a positive whole number.' }
+  const qtyNum = newQty
   req.requestedQty = qtyNum
   req.history = req.history || []
   req.history.push(
@@ -815,6 +870,7 @@ export function updatePartsRequestQty(requestId, newQty, user = 'Operations Plan
 
   requests[reqIndex] = req
   savePartsRequests(requests)
+  legacyLog(user, EVENT_TYPES.REORDER_QTY_EDITED, req, req.plannerDecision)
 
   return { success: true, request: req }
 }
@@ -826,6 +882,7 @@ export function recordPartsReceipt(requestId, user = 'Operations Planner') {
   if (reqIndex === -1) return { success: false, reason: 'Request not found' }
 
   const req = requests[reqIndex]
+  if (!permitted(user, ACTIONS.DECIDE_REORDER, req.siteId)) return denied()
   if (req.status !== 'Approved') {
     return { success: false, reason: 'Only approved requests can have receipt recorded' }
   }
@@ -834,6 +891,8 @@ export function recordPartsReceipt(requestId, user = 'Operations Planner') {
     return { success: false, reason: 'Receipt has already been processed for this request' }
   }
 
+  if (!validQty(req.requestedQty)) return { success: false, reason: 'Invalid quantity.' }
+  if (req.requestType === 'Site Transfer' && !req.inTransit) return { success: false, reason: 'Transfer has not left the source site.' }
   const inv = loadInventory()
   let itemIndex = inv.findIndex((i) => i.siteId === req.siteId && i.partId === req.partId)
 
@@ -857,15 +916,16 @@ export function recordPartsReceipt(requestId, user = 'Operations Planner') {
     itemIndex = inv.length - 1
   } else {
     // Increase onHand exactly once
-    inv[itemIndex].onHand += req.requestedQty
+    if (!(inv[itemIndex].receipts || []).includes(req.id)) inv[itemIndex].onHand += req.requestedQty
   }
 
+  inv[itemIndex].receipts = [...new Set([...(inv[itemIndex].receipts || []), req.id])]
   saveInventory(inv)
 
   // Update request state
   req.status = 'Received'
   req.receivedAt = new Date().toISOString()
-  req.receivedBy = user || 'Operations Planner'
+  req.receivedBy = actorFor(user)?.name || user || 'Operations Planner'
   req.receivedQty = req.requestedQty
   req.history = req.history || []
   req.history.push(
@@ -878,6 +938,7 @@ export function recordPartsReceipt(requestId, user = 'Operations Planner') {
 
   requests[reqIndex] = req
   savePartsRequests(requests)
+  legacyLog(user, EVENT_TYPES.REORDER_RECEIVED, req, req.plannerDecision)
 
   return {
     success: true,
