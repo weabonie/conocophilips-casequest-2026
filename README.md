@@ -1,5 +1,28 @@
 # React + Vite
 
+## Cloudflare Workers deployment
+
+In Cloudflare **Settings → Build**, use:
+
+- Build command: `pnpm run build`
+- Deploy command: `pnpm run deploy`
+- Root directory: repository root
+
+`wrangler.jsonc` is the deployment configuration. Do not pass `vite.config.js`
+to Wrangler's `--config` option. Set `name` in `wrangler.jsonc` to match the
+Worker name configured in Cloudflare (`casequest2026`).
+
+Run `pnpm run build` then `pnpm run deploy:check` to validate the deployment
+bundle without publishing. `pnpm run preview:cloudflare` previews the app and
+its `/api/sync-excel` endpoint in the Workers runtime.
+
+The Worker serves the Vite `dist/` assets and handles Excel refresh requests.
+Without a remote workbook URL it returns the bundled, cleaned historical
+snapshot; no filesystem access is required. Browser workbook imports still work.
+Remote workbook links must be downloadable without an interactive sign-in.
+For a server-side default workbook URL, set `VITE_EXCEL_ONLINE_URL` under
+Cloudflare **Settings → Variables and Secrets**, not just build variables.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
